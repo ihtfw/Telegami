@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Microsoft.Extensions.DependencyInjection;using Telegami;
+using Telegram.Bot.Types.Enums;
 
 Console.WriteLine("Hello, World!");
 
@@ -39,6 +40,11 @@ bot.Settings(async (IMessageContext ctx) =>
 bot.Command("custom", async (IMessageContext ctx) =>
 {
     await ctx.ReplyAsync($"this is custom command handler. args was: '{ctx.BotCommand!.Arguments}'");
+});
+
+bot.On(MessageType.Sticker, async (IMessageContext ctx) =>
+{
+    await ctx.ReplyAsync($"What a nice sticker!");
 });
 
 bot.Hears("hello", async (IMessageContext ctx, MyCustomService myCustomService) =>

@@ -4,6 +4,8 @@ using Telegami.MessageHandlers;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Telegami
 {
@@ -59,6 +61,11 @@ namespace Telegami
         public void Hears(string text, Delegate handler)
         {
             _handlers.Add(new HearsMessageHandler(text, handler));
+        }
+
+        public void On(MessageType messageType, Delegate handler)
+        {
+            _handlers.Add(new TypeMessageHandler(messageType, handler));
         }
 
         public async Task LaunchAsync()
