@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Telegami.Demo.Console": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "BOT_TOKEN": "5191842660:AAEq1rOwbRNsOU2HkOrKkoVjxqihArQBUd8"
+      }
+    }
+  }
+}

@@ -1,1 +1,1 @@
-# Teligami
+# Telegami

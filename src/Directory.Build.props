@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>12</LangVersion>
+    <Authors>ihtfw</Authors>
+    <PackageProjectUrl>https://github.com/ihtfw/Teligami</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ihtfw/Teligami</RepositoryUrl>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Version>$(VersionPrefix)</Version>
+    <!-- NU1008 - should not define the version on the PackageReference items but on the PackageVersion items -->
+    <!-- NU1504 - Duplicate 'PackageReference' items found -->
+    <!-- NU1506 - Duplicate 'PackageVersion' items found -->
+    <WarningsAsErrors>$(WarningsAsErrors);NU1506;NU1008;NU1504</WarningsAsErrors>
+  </PropertyGroup>
+</Project>
