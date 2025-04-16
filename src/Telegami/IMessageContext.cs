@@ -12,6 +12,10 @@ public interface IMessageContext
     BotCommand? BotCommand { get; }
     bool IsCommand => BotCommand != null;
 
+    Task LeaveSceneAsync();
+
+    Task EnterSceneAsync(string name);
+
     /// <summary>
     /// Reply to the message with a text message.
     /// </summary>

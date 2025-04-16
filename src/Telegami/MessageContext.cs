@@ -7,7 +7,7 @@ namespace Telegami;
 
 internal class MessageContext : IMessageContext
 {
-    private readonly ITelegramBotClient _client;
+    public TelegamiBot Bot { get; }
 
     public Update Update { get; }
     public Message Message { get; }
@@ -15,9 +15,9 @@ internal class MessageContext : IMessageContext
 
     public BotCommand? BotCommand { get; }
 
-    public MessageContext(ITelegramBotClient client, Update update, Message message, User botUser)
+    public MessageContext(TelegamiBot bot, Update update, Message message, User botUser)
     {
-        _client = client;
+        Bot = bot;
         Update = update;
         Message = message;
         BotUser = botUser;
@@ -27,7 +27,17 @@ internal class MessageContext : IMessageContext
             BotCommand = botCommand;
         }
     }
-    
+
+    public Task LeaveSceneAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task EnterSceneAsync(string name)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Message> ReplyAsync(string text,
         ParseMode parseMode = default,
         ReplyMarkup? replyMarkup = null,
@@ -44,7 +54,7 @@ internal class MessageContext : IMessageContext
             MessageId = Message.Id
         };
 
-        var message = _client.SendMessage(chatId, text,
+        var message = Bot.Client.SendMessage(chatId, text,
             parseMode: parseMode,
             replyParameters: replyParameters,
             replyMarkup: replyMarkup,
