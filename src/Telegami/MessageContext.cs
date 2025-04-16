@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using Telegami.Sessions;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -28,14 +29,16 @@ internal class MessageContext : IMessageContext
         }
     }
 
+    public ITelegamiSession? Session { get; set; }
+
     public Task LeaveSceneAsync()
     {
-        throw new NotImplementedException();
+        return Bot.LeaveSceneAsync(this, Session?.Scene);
     }
 
-    public Task EnterSceneAsync(string name)
+    public Task EnterSceneAsync(string sceneName)
     {
-        throw new NotImplementedException();
+        return Bot.EnterSceneAsync(this, sceneName);
     }
 
     public Task<Message> ReplyAsync(string text,
@@ -48,7 +51,7 @@ internal class MessageContext : IMessageContext
     {
         var chatId = Message.Chat.Id;
 
-        var replyParameters = new ReplyParameters()
+        var replyParameters = new ReplyParameters
         {
             ChatId = chatId,
             MessageId = Message.Id

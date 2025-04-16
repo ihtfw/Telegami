@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using Telegami.Sessions;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -11,10 +12,11 @@ public interface IMessageContext
     User BotUser { get; }
     BotCommand? BotCommand { get; }
     bool IsCommand => BotCommand != null;
+    ITelegamiSession? Session { get; set; }
 
     Task LeaveSceneAsync();
 
-    Task EnterSceneAsync(string name);
+    Task EnterSceneAsync(string sceneName);
 
     /// <summary>
     /// Reply to the message with a text message.

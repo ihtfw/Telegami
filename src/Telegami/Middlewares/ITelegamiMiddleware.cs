@@ -2,5 +2,5 @@
 
 public interface ITelegamiMiddleware
 {
-    Task InvokeAsync(IMessageContext context, MessageContextDelegate next);
+    Task InvokeAsync(IMessageContext ctx, MessageContextDelegate next);
 }

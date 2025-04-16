@@ -1,11 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using Microsoft.Extensions.DependencyInjection;using Telegami;
+﻿
+using Microsoft.Extensions.DependencyInjection;
+using Telegami;
 using Telegami.Demo.Console.Middlewares;
 using Telegami.Scenes;
 using Telegram.Bot.Types.Enums;
-
-Console.WriteLine("Hello, World!");
 
 var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
 if (string.IsNullOrEmpty(token))
@@ -74,13 +72,14 @@ bot.On(async ctx =>
     await ctx.ReplyAsync("not handled message");
 });
 
-// var echoScene = new Scene("echo");
-// echoScene.Enter(async ctx => await ctx.ReplyAsync("echo scene"));
-// echoScene.Leave(async ctx => await ctx.ReplyAsync("exiting echo scene"));
-// echoScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
-// echoScene.On(MessageType.Text, async ctx => await ctx.ReplyAsync(ctx.Message.Text ?? ""));
-// echoScene.On(async ctx => await ctx.ReplyAsync("Only text messages please"));
-// bot.AddScene(echoScene);
+var echoScene = new Scene("echo");
+echoScene.Enter(async ctx => await ctx.ReplyAsync("echo scene"));
+echoScene.Leave(async ctx => await ctx.ReplyAsync("exiting echo scene"));
+echoScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
+echoScene.Command("leave", async ctx => await ctx.LeaveSceneAsync());
+echoScene.On(MessageType.Text, async ctx => await ctx.ReplyAsync(ctx.Message.Text ?? ""));
+echoScene.On(async ctx => await ctx.ReplyAsync("Only text messages please"));
+bot.AddScene(echoScene);
 
 await bot.LaunchAsync();
 

@@ -1,6 +1,9 @@
-﻿using Telegami.Extensions;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Telegami.Extensions;
 using Telegami.Middlewares;
 using Telegami.Scenes;
+using Telegami.Sessions;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -10,6 +13,7 @@ namespace Telegami
 {
     public class TelegamiBot : IMessagesHandler
     {
+        private readonly ScenesManager _scenesManager = new();
         private readonly MessagesHandler _messagesHandler = new();
         private readonly MiddlewarePipelineBuilder _pipelineBuilder = new();
         private MessageContextDelegate _pipeline = _ => Task.CompletedTask;
@@ -18,8 +22,6 @@ namespace Telegami
         private readonly TelegamiBotConfig _config;
         
         internal ITelegramBotClient Client { get; }
-
-        private readonly Dictionary<string, IScene> _nameToScene = new(StringComparer.InvariantCultureIgnoreCase);
 
         public TelegamiBot(string token) : this(new TelegamiBotConfig(token)) { }
 
@@ -31,11 +33,13 @@ namespace Telegami
         }
 
         public required IServiceProvider ServiceProvider { get; init; }
+        public ITelegamiSessionsProvider SessionsProvider { get; init; } = new InMemoryTelegamiSessionsProvider();
         
         public async Task LaunchAsync()
         {
-            // handle message in last step
-            _pipelineBuilder.Use(() => new MessageHandlerMiddleware(ServiceProvider, _messagesHandler));
+            // default middlewares
+            _pipelineBuilder.Use(() => new TelegamiSessionMiddleware(SessionsProvider));
+            _pipelineBuilder.Use(() => new MessageHandlerMiddleware(ServiceProvider, _messagesHandler, _scenesManager));
 
             _pipeline = _pipelineBuilder.Build();
             _botUser = await Client.GetMe();
@@ -60,34 +64,6 @@ namespace Telegami
             var messageContext = new MessageContext(this, update, message, _botUser!);
 
             await _pipeline(messageContext);
-            //
-            // foreach (var messageHandler in _handlers)
-            // {
-            //     if (!await messageHandler.CanHandleAsync(messageContext))
-            //     {
-            //         continue;
-            //     }
-            //
-            //     await using var scope = ServiceProvider.CreateAsyncScope();
-            //
-            //     var parameters = messageHandler.Handler.Method.GetParameters();
-            //     var args = parameters
-            //         .Select(p =>
-            //         {
-            //             if (p.ParameterType.IsAssignableTo(typeof(IMessageContext)))
-            //             {
-            //                 return messageContext;
-            //             }
-            //
-            //             return scope.ServiceProvider.GetRequiredService(p.ParameterType);
-            //         })
-            //         .ToArray();
-            //
-            //     var result = messageHandler.Handler.DynamicInvoke(args);
-            //
-            //     if (result is Task task)
-            //         await task;
-            // }
         }
 
         private Task ErrorHandler(ITelegramBotClient arg1, Exception arg2, HandleErrorSource arg3, CancellationToken arg4)
@@ -95,11 +71,50 @@ namespace Telegami
             return Task.CompletedTask;
         }
 
-        public void AddScene(IScene scene)
+        #region Scenes
+
+        internal async Task LeaveSceneAsync(IMessageContext ctx, string? sceneName)
         {
-            _nameToScene.Add(scene.Name, scene);
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                return;
+            }
+
+            if (_scenesManager.TryGet(sceneName, out var scene))
+            {
+                await using var scope = ServiceProvider.CreateAsyncScope();
+                await MessageHandlerUtils.InvokeAsync(ctx, scene!.LeaveHandler, scope);
+            }
+
+            ctx.Session!.Scene = null;
+            ctx.Session.SceneState = null;
         }
 
+        internal async Task EnterSceneAsync(IMessageContext ctx, string sceneName)
+        {
+            if (!_scenesManager.TryGet(sceneName, out var scene))
+            {
+                await ctx.ReplyAsync($"Attempt to enter scene: '{sceneName}', but it's not found!");
+                return;
+            }
+
+            // just in case we are already in the scene, we should leave it
+            await LeaveSceneAsync(ctx, ctx.Session!.Scene);
+
+            ctx.Session!.Scene = sceneName;
+            
+            await using var scope = ServiceProvider.CreateAsyncScope();
+            await MessageHandlerUtils.InvokeAsync(ctx, scene!.EnterHandler, scope);
+
+            ctx.Session.SceneState = "entered";
+        }
+
+        public void AddScene(IScene scene)
+        {
+            _scenesManager.Add(scene);
+        }
+
+        #endregion
 
         #region Pipeline
 
