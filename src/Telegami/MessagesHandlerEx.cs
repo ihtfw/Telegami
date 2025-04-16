@@ -4,7 +4,7 @@ namespace Telegami;
 
 public static class MessagesHandlerEx
 {
-    public static void Start(this IMessagesHandler messagesHandler, Func<IMessageContext, Task> handler)
+    public static void Start(this IMessagesHandler messagesHandler, Func<MessageContext, Task> handler)
     {
         messagesHandler.Command("start", handler);
     }
@@ -22,7 +22,7 @@ public static class MessagesHandlerEx
     {
         messagesHandler.Command("help", handler);
     }
-    public static void Help(this IMessagesHandler messagesHandler, Func<IMessageContext, Task> handler)
+    public static void Help(this IMessagesHandler messagesHandler, Func<MessageContext, Task> handler)
     {
         messagesHandler.Command("help", handler);
     }
@@ -37,7 +37,7 @@ public static class MessagesHandlerEx
         messagesHandler.Command("settings", handler);
     }
 
-    public static void Settings(this IMessagesHandler messagesHandler, Func<IMessageContext, Task> handler)
+    public static void Settings(this IMessagesHandler messagesHandler, Func<MessageContext, Task> handler)
     {
         messagesHandler.Command("settings", handler);
     }
@@ -52,7 +52,7 @@ public static class MessagesHandlerEx
         messagesHandler.Command(command, handler);
     }
 
-    public static void Command(this IMessagesHandler messagesHandler, string command, Func<IMessageContext, Task> handler)
+    public static void Command(this IMessagesHandler messagesHandler, string command, Func<MessageContext, Task> handler)
     {
         messagesHandler.Command(command, handler);
     }
@@ -62,7 +62,7 @@ public static class MessagesHandlerEx
         messagesHandler.Hears(text, handler);
     }
 
-    public static void Hears(this IMessagesHandler messagesHandler, string text, Func<IMessageContext, Task> handler)
+    public static void Hears(this IMessagesHandler messagesHandler, string text, Func<MessageContext, Task> handler)
     {
         messagesHandler.Hears(text, handler);
     }
@@ -72,7 +72,7 @@ public static class MessagesHandlerEx
         messagesHandler.On(messageType, handler);
     }
 
-    public static void On(this IMessagesHandler messagesHandler, MessageType messageType, Func<IMessageContext, Task> handler)
+    public static void On(this IMessagesHandler messagesHandler, MessageType messageType, Func<MessageContext, Task> handler)
     {
         messagesHandler.On(messageType, handler);
     }
@@ -82,7 +82,7 @@ public static class MessagesHandlerEx
         messagesHandler.On(MessageType.Unknown, handler);
     }
 
-    public static void On(this IMessagesHandler messagesHandler, Func<IMessageContext, Task> handler)
+    public static void On(this IMessagesHandler messagesHandler, Func<MessageContext, Task> handler)
     {
         messagesHandler.On(MessageType.Unknown, handler);
     }

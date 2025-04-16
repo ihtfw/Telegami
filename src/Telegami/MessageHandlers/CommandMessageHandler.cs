@@ -9,7 +9,7 @@ internal sealed class CommandMessageHandler : BaseMessageHandler
         Command = command;
     }
 
-    public override bool CanHandle(IMessageContext ctx)
+    public override bool CanHandle(MessageContext ctx)
     {
         if (!ctx.IsCommand)
         {

@@ -9,7 +9,7 @@ internal sealed class HearsMessageHandler : BaseMessageHandler
         Text = text;
     }
 
-    public override bool CanHandle(IMessageContext ctx)
+    public override bool CanHandle(MessageContext ctx)
     {
         if (ctx.Message.Text == null)
         {

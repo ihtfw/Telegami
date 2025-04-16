@@ -10,7 +10,7 @@ class MiddlewarePipelineBuilder
     //     return this;
     // }
 
-    public MiddlewarePipelineBuilder Use(Func<IMessageContext, MessageContextDelegate, Task> middleware)
+    public MiddlewarePipelineBuilder Use(Func<MessageContext, MessageContextDelegate, Task> middleware)
     {
         _components.Add(next => async ctx =>
         {

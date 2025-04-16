@@ -1,3 +1,3 @@
 ﻿namespace Telegami;
 
-public delegate Task MessageContextDelegate(IMessageContext context);
+public delegate Task MessageContextDelegate(MessageContext context);

@@ -31,7 +31,7 @@ namespace Telegami.Scenes
             Leave((Delegate)func);
         }
 
-        public void Leave(Func<IMessageContext, Task> func)
+        public void Leave(Func<MessageContext, Task> func)
         {
             Leave((Delegate)func);
         }
@@ -46,7 +46,7 @@ namespace Telegami.Scenes
             Enter((Delegate)func);
         }
 
-        public void Enter(Func<IMessageContext, Task> func)
+        public void Enter(Func<MessageContext, Task> func)
         {
             Enter((Delegate)func);
         }

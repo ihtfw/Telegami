@@ -11,7 +11,7 @@ internal sealed class TypeMessageHandler : BaseMessageHandler
         MessageType = messageType;
     }
 
-    public override bool CanHandle(IMessageContext ctx)
+    public override bool CanHandle(MessageContext ctx)
     {
         if (MessageType == MessageType.Unknown) return true;
 

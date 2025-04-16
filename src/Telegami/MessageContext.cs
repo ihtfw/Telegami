@@ -1,4 +1,5 @@
-﻿using Telegami.Sessions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Telegami.Sessions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -6,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegami;
 
-internal class MessageContext : IMessageContext
+public sealed class MessageContext
 {
     public TelegamiBot Bot { get; }
 
@@ -14,14 +15,17 @@ internal class MessageContext : IMessageContext
     public Message Message { get; }
     public User BotUser { get; }
 
+    public AsyncServiceScope Scope { get; }
+
     public BotCommand? BotCommand { get; }
 
-    public MessageContext(TelegamiBot bot, Update update, Message message, User botUser)
+    internal MessageContext(TelegamiBot bot, Update update, Message message, User botUser, AsyncServiceScope scope)
     {
         Bot = bot;
         Update = update;
         Message = message;
         BotUser = botUser;
+        Scope = scope;
 
         if (BotCommand.TryParse(message.Text, out var botCommand))
         {
@@ -29,11 +33,13 @@ internal class MessageContext : IMessageContext
         }
     }
 
-    public ITelegamiSession? Session { get; set; }
+    public ITelegamiSession Session { get; set; }
+
+    public bool IsCommand => BotCommand != null;
 
     public Task LeaveSceneAsync()
     {
-        return Bot.LeaveSceneAsync(this, Session?.Scene);
+        return Bot.LeaveSceneAsync(this, Session.Scene);
     }
 
     public Task EnterSceneAsync(string sceneName)

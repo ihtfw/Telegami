@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Telegami.Extensions;
 using Telegami.Middlewares;
 using Telegami.Scenes;
@@ -39,7 +38,7 @@ namespace Telegami
         {
             // default middlewares
             _pipelineBuilder.Use(() => new TelegamiSessionMiddleware(SessionsProvider));
-            _pipelineBuilder.Use(() => new MessageHandlerMiddleware(ServiceProvider, _messagesHandler, _scenesManager));
+            _pipelineBuilder.Use(() => new MessageHandlerMiddleware(_messagesHandler, _scenesManager));
 
             _pipeline = _pipelineBuilder.Build();
             _botUser = await Client.GetMe();
@@ -61,7 +60,8 @@ namespace Telegami
                 return;
             }
 
-            var messageContext = new MessageContext(this, update, message, _botUser!);
+            await using var scope = ServiceProvider.CreateAsyncScope();
+            var messageContext = new MessageContext(this, update, message, _botUser!, scope);
 
             await _pipeline(messageContext);
         }
@@ -73,7 +73,7 @@ namespace Telegami
 
         #region Scenes
 
-        internal async Task LeaveSceneAsync(IMessageContext ctx, string? sceneName)
+        internal async Task LeaveSceneAsync(MessageContext ctx, string? sceneName)
         {
             if (string.IsNullOrEmpty(sceneName))
             {
@@ -82,15 +82,13 @@ namespace Telegami
 
             if (_scenesManager.TryGet(sceneName, out var scene))
             {
-                await using var scope = ServiceProvider.CreateAsyncScope();
-                await MessageHandlerUtils.InvokeAsync(ctx, scene!.LeaveHandler, scope);
+                await MessageHandlerUtils.InvokeAsync(ctx, scene!.LeaveHandler);
             }
 
-            ctx.Session!.Scene = null;
-            ctx.Session.SceneState = null;
+            ctx.Session.Reset();
         }
 
-        internal async Task EnterSceneAsync(IMessageContext ctx, string sceneName)
+        internal async Task EnterSceneAsync(MessageContext ctx, string sceneName)
         {
             if (!_scenesManager.TryGet(sceneName, out var scene))
             {
@@ -99,14 +97,11 @@ namespace Telegami
             }
 
             // just in case we are already in the scene, we should leave it
-            await LeaveSceneAsync(ctx, ctx.Session!.Scene);
+            await LeaveSceneAsync(ctx, ctx.Session.Scene);
 
-            ctx.Session!.Scene = sceneName;
+            ctx.Session.Scene = sceneName;
             
-            await using var scope = ServiceProvider.CreateAsyncScope();
-            await MessageHandlerUtils.InvokeAsync(ctx, scene!.EnterHandler, scope);
-
-            ctx.Session.SceneState = "entered";
+            await MessageHandlerUtils.InvokeAsync(ctx, scene!.EnterHandler);
         }
 
         public void AddScene(IScene scene)

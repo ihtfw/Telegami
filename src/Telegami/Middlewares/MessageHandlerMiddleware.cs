@@ -1,50 +1,75 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using Telegami.Scenes;
 
 namespace Telegami.Middlewares
 {
     internal class MessageHandlerUtils
     {
-        public static async Task InvokeAsync(IMessageContext ctx, IMessageHandler messageHandler, AsyncServiceScope scope)
+        public static async Task InvokeAsync(MessageContext ctx, IMessageHandler messageHandler)
         {
             var parameters = messageHandler.Handler.Method.GetParameters();
             var args = parameters
                 .Select(p =>
                 {
-                    if (p.ParameterType.IsAssignableTo(typeof(IMessageContext)))
+                    if (p.ParameterType == typeof(MessageContext))
                     {
                         return ctx;
                     }
 
-                    return scope.ServiceProvider.GetRequiredService(p.ParameterType);
+                    if (p.ParameterType == typeof(WizardContext))
+                    {
+                        return new WizardContext(ctx);
+                    }
+
+                    if (p.ParameterType.IsAssignableTo(typeof(WizardContext)) && p.ParameterType.IsGenericType)
+                    {
+                        var genericArgType = p.ParameterType.GenericTypeArguments[0];
+                        Type genericType = typeof(WizardContext<>);
+                        Type concreteType = genericType.MakeGenericType(genericArgType);  
+
+                        return Activator.CreateInstance(concreteType, 
+                            bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
+                            binder: null,
+                            args: [ctx],
+                            culture:null); 
+                    }
+
+                    return ctx.Scope.ServiceProvider.GetRequiredService(p.ParameterType);
                 })
                 .ToArray();
 
-            var result = messageHandler.Handler.DynamicInvoke(args);
+            try
+            {
+                var result = messageHandler.Handler.DynamicInvoke(args);
 
-            if (result is Task task)
-                await task;
+                if (result is Task task)
+                    await task;
+            }
+            finally
+            {
+                foreach (var arg in args.OfType<IHaveInvokeAfterEffect>())
+                {
+                    await arg.InvokeAfterEffectAsync();
+                }
+            }
         }
 
     }
 
     internal class MessageHandlerMiddleware : ITelegamiMiddleware
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly IMessagesHandler _messagesHandler;
         private readonly ScenesManager _scenesManager;
 
-        public MessageHandlerMiddleware(IServiceProvider serviceProvider, IMessagesHandler messagesHandler, ScenesManager scenesManager)
+        public MessageHandlerMiddleware(IMessagesHandler messagesHandler, ScenesManager scenesManager)
         {
-            _serviceProvider = serviceProvider;
             _messagesHandler = messagesHandler;
             _scenesManager = scenesManager;
         }
 
-        public async Task InvokeAsync(IMessageContext ctx, MessageContextDelegate next)
+        public async Task InvokeAsync(MessageContext ctx, MessageContextDelegate next)
         {
-            await using var scope = _serviceProvider.CreateAsyncScope();
-
             var resolvedMessagesHandler = _messagesHandler;
 
             var sceneName = ctx.Session?.Scene;
@@ -63,7 +88,7 @@ namespace Telegami.Middlewares
                     continue;
                 }
 
-                await MessageHandlerUtils.InvokeAsync(ctx, messageHandler, scope);
+                await MessageHandlerUtils.InvokeAsync(ctx, messageHandler);
 
                 // we handled message, so no need to process it by other handlers
                 return;

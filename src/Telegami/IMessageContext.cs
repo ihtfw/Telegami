@@ -1,56 +1,46 @@
 ﻿using Telegami.Sessions;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegami;
 
-public interface IMessageContext
+public sealed class WizardContext<TState> : WizardContext, IHaveInvokeAfterEffect where TState : class, new()
 {
-    Update Update { get; }
-    Message Message { get; }
-    User BotUser { get; }
-    BotCommand? BotCommand { get; }
-    bool IsCommand => BotCommand != null;
-    ITelegamiSession? Session { get; set; }
+    public TState State { get; }
 
-    Task LeaveSceneAsync();
+    internal WizardContext(MessageContext ctx) : base(ctx)
+    {
+        State = ctx.Session.Get<TState>() ?? new TState();
+    }
 
-    Task EnterSceneAsync(string sceneName);
+    public Task InvokeAfterEffectAsync()
+    {
+        Ctx.Session.Set(State);
+        return Task.CompletedTask;
+    }
+}
 
-    /// <summary>
-    /// Reply to the message with a text message.
-    /// </summary>
-    /// <param name="text"></param>
-    /// <param name="parseMode"></param>
-    /// <param name="replyMarkup"></param>
-    /// <param name="linkPreviewOptions"></param>
-    /// <param name="disableNotification"></param>
-    /// <param name="protectContent"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<Message> ReplyAsync(string text, ParseMode parseMode = default,
-        ReplyMarkup? replyMarkup = null,
-        LinkPreviewOptions? linkPreviewOptions = null,
-        bool disableNotification = false,
-        bool protectContent = false,
-        CancellationToken cancellationToken = default);
+public class WizardContext
+{
+    protected readonly MessageContext Ctx;
 
-    /// <summary>
-    /// Send message to the chat
-    /// </summary>
-    /// <param name="text"></param>
-    /// <param name="parseMode"></param>
-    /// <param name="replyMarkup"></param>
-    /// <param name="linkPreviewOptions"></param>
-    /// <param name="disableNotification"></param>
-    /// <param name="protectContent"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<Message> SendAsync(string text, ParseMode parseMode = default,
-        ReplyMarkup? replyMarkup = null,
-        LinkPreviewOptions? linkPreviewOptions = null,
-        bool disableNotification = false,
-        bool protectContent = false,
-        CancellationToken cancellationToken = default);
+    internal WizardContext(MessageContext ctx)
+    {
+        Ctx = ctx;
+    }
+
+    public void Next()
+    {
+        Ctx.Session.SceneStageIndex++;
+    }
+
+    public void Prev()
+    {
+        Ctx.Session.SceneStageIndex--;
+    }
+
+    public void Set(int index)
+    {
+        Ctx.Session.SceneStageIndex = index;
+    }
+
+    public int Index => Ctx.Session.SceneStageIndex;
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Telegami.Middlewares;
+﻿using Telegami.Middlewares;
 
 namespace Telegami.Sessions;
 
@@ -12,7 +11,7 @@ public class TelegamiSessionMiddleware : ITelegamiMiddleware
         _telegamiSessionsProvider = telegamiSessionsProvider;
     }
 
-    public async Task InvokeAsync(IMessageContext ctx, MessageContextDelegate next)
+    public async Task InvokeAsync(MessageContext ctx, MessageContextDelegate next)
     {
         var key = TelegamiSessionKey.From(ctx);
         var session = await _telegamiSessionsProvider.GetAsync(key);
@@ -23,12 +22,7 @@ public class TelegamiSessionMiddleware : ITelegamiMiddleware
         }
         else
         {
-            var timestamp = Stopwatch.GetTimestamp();
-            var newSession = new TelegamiSession
-            {
-                CreatedTimestamp = timestamp,
-                UpdatedTimestamp = timestamp
-            };
+            var newSession = new TelegamiSession();
             ctx.Session = newSession;
             await _telegamiSessionsProvider.SetAsync(key, newSession);
         }
