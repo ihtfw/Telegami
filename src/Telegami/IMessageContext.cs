@@ -35,4 +35,22 @@ public interface IMessageContext
         bool disableNotification = false,
         bool protectContent = false,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Send message to the chat
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="linkPreviewOptions"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="protectContent"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Message> SendAsync(string text, ParseMode parseMode = default,
+        ReplyMarkup? replyMarkup = null,
+        LinkPreviewOptions? linkPreviewOptions = null,
+        bool disableNotification = false,
+        bool protectContent = false,
+        CancellationToken cancellationToken = default);
 }

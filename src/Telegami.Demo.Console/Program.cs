@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Telegami;
 using Telegami.Demo.Console.Middlewares;
 using Telegami.Scenes;
+using Telegami.Sessions;
 using Telegram.Bot.Types.Enums;
 
 var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
@@ -50,6 +51,11 @@ bot.Command("echo", async ctx =>
     await ctx.EnterSceneAsync("echo");
 });
 
+bot.Command("person", async ctx =>
+{
+    await ctx.EnterSceneAsync("person");
+});
+
 bot.Command("error", () => throw new Exception("This is a test exception"));
 
 bot.On(MessageType.Sticker, async (IMessageContext ctx) =>
@@ -80,6 +86,40 @@ echoScene.Command("leave", async ctx => await ctx.LeaveSceneAsync());
 echoScene.On(MessageType.Text, async ctx => await ctx.ReplyAsync(ctx.Message.Text ?? ""));
 echoScene.On(async ctx => await ctx.ReplyAsync("Only text messages please"));
 bot.AddScene(echoScene);
+
+var personCardScene = new Scene("person");
+personCardScene.Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"));
+personCardScene.Leave(async ctx =>
+{
+    var name = ctx.Session!.Get("name");
+    var lastName = ctx.Session!.Get("lastName");
+    var age = ctx.Session!.Get("age");
+
+    await ctx.ReplyAsync($"Your name is {name} {lastName}, you are {age} years old.");
+});
+
+personCardScene.On(MessageType.Text, async ctx =>
+{
+    var name = ctx.Session!.Get("name");
+    if (string.IsNullOrEmpty(name))
+    {
+        ctx.Session!.Set("name", ctx.Message!.Text!);
+        await ctx.ReplyAsync($"What's your last name?");
+        return;
+    }
+
+    var lastName = ctx.Session!.Get("lastName");
+    if (string.IsNullOrEmpty(lastName))
+    {
+        ctx.Session!.Set("lastName", ctx.Message!.Text!);
+        await ctx.ReplyAsync($"What's your age?");
+        return;
+    }
+
+    ctx.Session!.Set("age", ctx.Message!.Text!);
+    await ctx.LeaveSceneAsync();
+});
+bot.AddScene(personCardScene);
 
 await bot.LaunchAsync();
 

@@ -69,4 +69,22 @@ internal class MessageContext : IMessageContext
 
         return message;
     }
+
+    public Task<Message> SendAsync(string text, ParseMode parseMode = default, ReplyMarkup? replyMarkup = null,
+        LinkPreviewOptions? linkPreviewOptions = null, bool disableNotification = false, bool protectContent = false,
+        CancellationToken cancellationToken = default)
+    {
+        var chatId = Message.Chat.Id;
+        
+        var message = Bot.Client.SendMessage(chatId, text,
+            parseMode: parseMode,
+            replyMarkup: replyMarkup,
+            linkPreviewOptions: linkPreviewOptions,
+            messageThreadId: Message.MessageThreadId,
+            disableNotification: disableNotification,
+            protectContent: protectContent,
+            cancellationToken: cancellationToken);
+
+        return message;
+    }
 }

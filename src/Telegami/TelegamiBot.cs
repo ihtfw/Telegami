@@ -132,7 +132,7 @@ namespace Telegami
 
         #region IMessagesHandler
 
-        public IReadOnlyList<IMessageHandler> Handlers => _messagesHandler.Handlers;
+        IReadOnlyList<IMessageHandler> IMessagesHandler.Handlers => _messagesHandler.Handlers;
 
         public void Command(string command, Delegate handler)
         {

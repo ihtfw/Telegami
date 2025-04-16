@@ -8,8 +8,13 @@ namespace Telegami.Scenes
 
         public string Name { get; }
 
-        public IMessageHandler EnterHandler { get; private set; } = EmptyMessageHandler.Instance;
-        public IMessageHandler LeaveHandler { get; private set; } = EmptyMessageHandler.Instance;
+        private IMessageHandler EnterHandler { get; set; } = EmptyMessageHandler.Instance;
+
+        IMessageHandler IScene.EnterHandler => EnterHandler;
+
+        private IMessageHandler LeaveHandler { get; set; } = EmptyMessageHandler.Instance;
+
+        IMessageHandler IScene.LeaveHandler => LeaveHandler;
 
         public Scene(string name)
         {
@@ -48,7 +53,7 @@ namespace Telegami.Scenes
 
         #region IMessagesHandler
 
-        public IReadOnlyList<IMessageHandler> Handlers => _messagesHandler.Handlers;
+        IReadOnlyList<IMessageHandler> IMessagesHandler.Handlers => _messagesHandler.Handlers;
 
         public void Command(string command, Delegate handler)
         {
