@@ -7,15 +7,11 @@ namespace Telegami.Sessions;
 public class TelegamiSession : ITelegamiSession
 {
     public ConcurrentDictionary<string, string> KeyValues { get; set; } = new();
-
-    public string? Scene { get; set; }
-
-    public int SceneStageIndex { get; set; }
+    public ConcurrentStack<TelegamiSessionScene> Scenes { get; set; } = new();
 
     public void Reset()
     {
         KeyValues.Clear();
-        Scene = null;
-        SceneStageIndex = 0;
+        Scenes.Clear();
     }
 }

@@ -5,6 +5,21 @@ namespace Telegami.Sessions
 {
     public static class TelegamiSessionEx
     {
+        public static void DropCurrentScene(this ITelegamiSession telegamiSession)
+        {
+            telegamiSession.Scenes.TryPop(out _);
+        }
+
+        public static string? CurrentScene(this ITelegamiSession telegamiSession)
+        {
+            if (telegamiSession.Scenes.TryPeek(out var scene))
+            {
+                return scene.Name;
+            }
+
+            return null;
+        }
+
         public static string? Get(this ITelegamiSession telegamiSession, string key)
         {
             return telegamiSession.KeyValues.GetValueOrDefault(key);
@@ -56,11 +71,22 @@ namespace Telegami.Sessions
         }
     }
 
+    public class TelegamiSessionScene
+    {
+        public required string Name { get; set; }
+        public int StageIndex { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name} {StageIndex}";
+        }
+    }
+
     public interface ITelegamiSession
     {
         ConcurrentDictionary<string, string> KeyValues { get; set; }
-        string? Scene { get; set; }
-        int SceneStageIndex { get; set; }
+        ConcurrentStack<TelegamiSessionScene> Scenes { get; set; }
+
         void Reset();
     }
 }

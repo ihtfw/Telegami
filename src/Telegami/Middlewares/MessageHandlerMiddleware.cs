@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Telegami.Scenes;
+using Telegami.Sessions;
 
 namespace Telegami.Middlewares
 {
@@ -72,13 +73,17 @@ namespace Telegami.Middlewares
         {
             var resolvedMessagesHandler = _messagesHandler;
 
-            var sceneName = ctx.Session.Scene;
-            if (sceneName != null)
+            var sceneName = ctx.Session.CurrentScene();
+            while (sceneName != null)
             {
                 if (_scenesManager.TryGet(sceneName, out var scene))
                 {
                     resolvedMessagesHandler = scene!;
+                    break;
                 }
+
+                ctx.Session.DropCurrentScene();
+                sceneName = ctx.Session.CurrentScene();
             }
             
             foreach (var messageHandler in resolvedMessagesHandler.Handlers)

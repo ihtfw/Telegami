@@ -15,8 +15,20 @@ public class InMemoryTelegamiSessionsProvider : ITelegamiSessionsProvider
             var json = item.data;
 
             var jsonSession = JsonSerializer.Deserialize(json, type) as ITelegamiSession;
+            if (jsonSession == null)
+            {
+                return Task.FromResult<ITelegamiSession?>(null);
+            }
 
-            return Task.FromResult(jsonSession);
+            if (jsonSession.Scenes.Count > 1)
+            {
+                // workaround to fix deserialization order problem
+                var scenes = jsonSession.Scenes.ToArray();
+                jsonSession.Scenes.Clear();
+                jsonSession.Scenes.PushRange(scenes);
+            }
+
+            return Task.FromResult<ITelegamiSession?>(jsonSession);
         }
 
         return Task.FromResult<ITelegamiSession?>(null);

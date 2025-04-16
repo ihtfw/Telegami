@@ -18,19 +18,22 @@ namespace Telegami
         private MessageContextDelegate _pipeline = _ => Task.CompletedTask;
 
         private User? _botUser;
-        
+
         internal ITelegramBotClient Client { get; }
 
-        public TelegamiBot(string token) : this(new TelegamiBotConfig(token)) { }
-
-        public TelegamiBot(TelegamiBotConfig config)
+        public TelegamiBot(IServiceProvider serviceProvider, string token)
         {
-            Client = new TelegramBotClient(new TelegramBotClientOptions(config.Token));
+            ServiceProvider = serviceProvider;
+            Client = new TelegramBotClient(new TelegramBotClientOptions(token));
         }
 
-        public required IServiceProvider ServiceProvider { get; init; }
+        public IServiceProvider ServiceProvider { get; }
         public ITelegamiSessionsProvider SessionsProvider { get; init; } = new InMemoryTelegamiSessionsProvider();
-        
+
+        /// <summary>
+        /// Will build pipeline, will get bot user from api and start receiving updates.
+        /// </summary>
+        /// <returns></returns>
         public async Task LaunchAsync()
         {
             // default middlewares
@@ -78,26 +81,35 @@ namespace Telegami
             }
         }
 
-        private Task ErrorHandler(ITelegramBotClient arg1, Exception arg2, HandleErrorSource arg3, CancellationToken arg4)
+        private Task ErrorHandler(ITelegramBotClient arg1, Exception arg2, HandleErrorSource arg3,
+            CancellationToken arg4)
         {
             return Task.CompletedTask;
         }
 
         #region Scenes
 
-        internal async Task LeaveSceneAsync(MessageContext ctx, string? sceneName)
+        internal async Task LeaveCurrentSceneAsync(MessageContext ctx)
         {
-            if (string.IsNullOrEmpty(sceneName))
+            var currentScene = ctx.Session.CurrentScene();
+            if (currentScene == null)
             {
                 return;
             }
 
-            if (_scenesManager.TryGet(sceneName, out var scene))
+            // let's exit current scene
+            if (_scenesManager.TryGet(currentScene, out var scene))
             {
                 await MessageHandlerUtils.InvokeAsync(ctx, scene!.LeaveHandler);
             }
 
-            ctx.Session.Reset();
+            // remove it from session
+            ctx.Session.Scenes.TryPop(out _);
+            if (ctx.Session.Scenes.Count == 0)
+            {
+                // if all scenes are popped, we can reset session to clear data
+                ctx.Session.Reset();
+            }
         }
 
         internal async Task EnterSceneAsync(MessageContext ctx, string sceneName)
@@ -108,11 +120,12 @@ namespace Telegami
                 return;
             }
 
-            // just in case we are already in the scene, we should leave it
-            await LeaveSceneAsync(ctx, ctx.Session.Scene);
+            ctx.Session.Scenes.Push(new TelegamiSessionScene()
+            {
+                Name = sceneName,
+                StageIndex = 0
+            });
 
-            ctx.Session.Scene = sceneName;
-            
             await MessageHandlerUtils.InvokeAsync(ctx, scene!.EnterHandler);
         }
 
@@ -125,11 +138,19 @@ namespace Telegami
 
         #region Pipeline
 
+        /// <summary>
+        /// Add middleware to the pipeline.
+        /// </summary>
+        /// <typeparam name="TMiddleware"></typeparam>
         public void Use<TMiddleware>() where TMiddleware : ITelegamiMiddleware, new()
         {
             _pipelineBuilder.Use<TMiddleware>();
         }
 
+        /// <summary>
+        /// Add middleware to the pipeline.
+        /// </summary>
+        /// <param name="factory"></param>
         public void Use(Func<ITelegamiMiddleware> factory)
         {
             _pipelineBuilder.Use(factory);
@@ -155,7 +176,7 @@ namespace Telegami
         {
             _messagesHandler.On(messageType, handler);
         }
-        
+
         #endregion
     }
 }

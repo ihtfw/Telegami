@@ -71,5 +71,10 @@ namespace Telegami.Scenes
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

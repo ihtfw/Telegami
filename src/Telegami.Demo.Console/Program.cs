@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Telegami;
+using Telegami.Demo.Console;
 using Telegami.Demo.Console.Middlewares;
 using Telegami.Scenes;
 using Telegami.Sessions;
@@ -17,10 +18,7 @@ serviceCollection.AddScoped<MyCustomService>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var bot = new TelegamiBot(token)
-{
-    ServiceProvider = serviceProvider
-};
+var bot = new TelegamiBot(serviceProvider, token);
 
 bot.Use<LoggerMiddleware>();
 bot.Use<GlobalErrorHandlerMiddleware>();
@@ -42,9 +40,9 @@ bot.Command("custom",
 
 bot.Command("echo", async ctx => { await ctx.EnterSceneAsync("echo"); });
 
-bot.Command("person", async ctx => { await ctx.EnterSceneAsync("person"); });
+bot.Command("person", async ctx => { await ctx.EnterSceneAsync("person_scene"); });
 
-bot.Command("wizard", async ctx => { await ctx.EnterSceneAsync("wizard"); });
+bot.Command("person_wizard", async ctx => { await ctx.EnterSceneAsync("person_wizard_scene"); });
 
 bot.Command("error", () => throw new Exception("This is a test exception"));
 
@@ -54,7 +52,6 @@ bot.Hears("hello", async (MessageContext ctx, MyCustomService _) => { await ctx.
 
 bot.Hears("world", async ctx => { await ctx.ReplyAsync("hello!"); });
 
-bot.On(async ctx => { await ctx.ReplyAsync("not handled message"); });
 
 #region echo scene
 
@@ -71,36 +68,42 @@ bot.AddScene(echoScene);
 
 #region person scene
 
-var personCardScene = new Scene("person");
+var personCardScene = new Scene("person_scene");
 personCardScene.Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"));
 personCardScene.Leave(async ctx =>
 {
-    var name = ctx.Session.Get("name");
-    var lastName = ctx.Session.Get("lastName");
-    var age = ctx.Session.Get("age");
+    var person = ctx.Session.Get<Person>() ?? new Person();
 
-    await ctx.ReplyAsync($"Your name is {name} {lastName}, you are {age} years old.");
+    await ctx.ReplyAsync($"Your name is {person.Name} {person.LastName}, you are {person.Age} years old.");
 });
 
 personCardScene.On(MessageType.Text, async ctx =>
 {
-    var name = ctx.Session.Get("name");
-    if (string.IsNullOrEmpty(name))
+    var person = ctx.Session.Get<Person>() ?? new Person();
+
+    if (string.IsNullOrEmpty(person.Name))
     {
-        ctx.Session.Set("name", ctx.Message.Text!);
+        person.Name = ctx.Message.Text;
+        ctx.Session.Set(person);
         await ctx.ReplyAsync($"What's your last name?");
         return;
     }
 
-    var lastName = ctx.Session.Get("lastName");
-    if (string.IsNullOrEmpty(lastName))
+    if (string.IsNullOrEmpty(person.LastName))
     {
-        ctx.Session.Set("lastName", ctx.Message.Text!);
+        person.LastName = ctx.Message.Text;
+        ctx.Session.Set(person);
         await ctx.ReplyAsync($"What's your age?");
         return;
     }
 
-    ctx.Session.Set("age", ctx.Message.Text!);
+    if (!int.TryParse(ctx.Message.Text, out var age))
+    {
+        await ctx.ReplyAsync($"Age should be a number!");
+        return;
+    }
+
+    person.Age = age;
     await ctx.LeaveSceneAsync();
 });
 bot.AddScene(personCardScene);
@@ -109,7 +112,7 @@ bot.AddScene(personCardScene);
 
 #region wizard scene
 
-var wizardScene = new WizardScene("wizard",
+var wizardScene = new WizardScene("person_wizard_scene",
     async (MessageContext ctx, WizardContext wiz) =>
     {
         await ctx.SendAsync("Hi! What's your name?");
@@ -165,24 +168,32 @@ bot.AddScene(wizardScene);
 
 #endregion
 
+#region nested scenes
+
+bot.Command("root_scene", async ctx => await ctx.EnterSceneAsync("root_scene"));
+var rootScene = new Scene("root_scene");
+rootScene.Enter(async ctx => await ctx.ReplyAsync("This is root scene"));
+rootScene.Leave(async ctx => await ctx.ReplyAsync("Exiting root scene"));
+rootScene.Command("child", async ctx => await ctx.EnterSceneAsync("child_scene"));
+rootScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
+rootScene.Command("leave", async ctx => await ctx.LeaveSceneAsync());
+rootScene.Command("exit", async ctx => await ctx.LeaveSceneAsync());
+rootScene.Command("ping", async ctx => await ctx.ReplyAsync("pong from root"));
+
+var childScene = new Scene("child_scene");
+childScene.Enter(async ctx => await ctx.ReplyAsync("This is child scene"));
+childScene.Leave(async ctx => await ctx.ReplyAsync("Exiting child scene"));
+childScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
+childScene.Command("ping", async ctx => await ctx.ReplyAsync("pong from child"));
+
+bot.AddScene(rootScene);
+bot.AddScene(childScene);
+
+#endregion
+
+bot.On(async ctx => { await ctx.ReplyAsync("not handled message"); });
 
 await bot.LaunchAsync();
 
 Console.WriteLine("Bot is running... Press any key to exit.");
 Console.ReadKey();
-
-class Person
-{
-    public string? Name { get; set; }
-    public string? LastName { get; set; }
-    public int? Age { get; set; }
-
-    public override string ToString()
-    {
-        return $"Name: {Name}, LastName: {LastName}, Age: {Age}";
-    }
-}
-
-class MyCustomService
-{
-}

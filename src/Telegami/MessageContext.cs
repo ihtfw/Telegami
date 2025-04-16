@@ -39,16 +39,36 @@ public sealed class MessageContext
 
     public bool IsCommand => BotCommand != null;
 
+    /// <summary>
+    /// Leaves the current scene and returns to previous scene.
+    /// </summary>
+    /// <returns></returns>
     public Task LeaveSceneAsync()
     {
-        return Bot.LeaveSceneAsync(this, Session.Scene);
+        return Bot.LeaveCurrentSceneAsync(this);
     }
 
+    /// <summary>
+    /// Enters the scene with the given name. Assumes that scene was already added to the bot via AddScene()
+    /// </summary>
+    /// <param name="sceneName"></param>
+    /// <returns></returns>
     public Task EnterSceneAsync(string sceneName)
     {
         return Bot.EnterSceneAsync(this, sceneName);
     }
 
+    /// <summary>
+    /// Will reply to the current message.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="linkPreviewOptions"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="protectContent"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public Task<Message> ReplyAsync(string text,
         ParseMode parseMode = default,
         ReplyMarkup? replyMarkup = null,
@@ -78,6 +98,17 @@ public sealed class MessageContext
         return message;
     }
 
+    /// <summary>
+    /// Send text message to the current chat.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="linkPreviewOptions"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="protectContent"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public Task<Message> SendAsync(string text, ParseMode parseMode = default, ReplyMarkup? replyMarkup = null,
         LinkPreviewOptions? linkPreviewOptions = null, bool disableNotification = false, bool protectContent = false,
         CancellationToken cancellationToken = default)

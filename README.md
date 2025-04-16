@@ -226,3 +226,39 @@ var wizardScene = new WizardScene("person_wizard_scene",
 bot.AddScene(wizardScene);
 
 ```
+
+# Middleware
+
+Inspired by ASP.NET
+
+## Error handler example
+
+Same logic as in ASP.NET every middleware have next delegate, so we can process MessageContext.
+
+```CSharp
+
+//.. other code
+
+var bot = new TelegamiBot(serviceProvider, token);
+bot.Use<GlobalErrorHandlerMiddleware>();
+
+//.. other code
+
+await bot.LaunchAsync();
+
+class GlobalErrorHandlerMiddleware : ITelegamiMiddleware
+{
+    public async Task InvokeAsync(MessageContext ctx, MessageContextDelegate next)
+    {
+        try
+        {
+            await next(ctx);
+        }
+        catch (Exception e)
+        {
+            System.Console.WriteLine(e);
+            await ctx.ReplyAsync("error: " + e.Message);
+        }
+    }
+}
+```
