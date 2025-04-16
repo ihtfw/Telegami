@@ -18,7 +18,6 @@ namespace Telegami
         private MessageContextDelegate _pipeline = _ => Task.CompletedTask;
 
         private User? _botUser;
-        private readonly TelegamiBotConfig _config;
         
         internal ITelegramBotClient Client { get; }
 
@@ -26,8 +25,6 @@ namespace Telegami
 
         public TelegamiBot(TelegamiBotConfig config)
         {
-            _config = config;
-
             Client = new TelegramBotClient(new TelegramBotClientOptions(config.Token));
         }
 
@@ -37,7 +34,7 @@ namespace Telegami
         public async Task LaunchAsync()
         {
             // default middlewares
-            _pipelineBuilder.Use(() => new TelegamiSessionMiddleware(SessionsProvider));
+            // _pipelineBuilder.Use(() => new TelegamiSessionMiddleware(SessionsProvider));
             _pipelineBuilder.Use(() => new MessageHandlerMiddleware(_messagesHandler, _scenesManager));
 
             _pipeline = _pipelineBuilder.Build();
@@ -49,7 +46,7 @@ namespace Telegami
         private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
         {
             var message = update.ResolveMessage();
-            if (message == null)
+            if (message == null || message.From == null)
             {
                 // No message to handle, so we can skip this update
                 return;
@@ -60,10 +57,25 @@ namespace Telegami
                 return;
             }
 
-            await using var scope = ServiceProvider.CreateAsyncScope();
-            var messageContext = new MessageContext(this, update, message, _botUser!, scope);
+            var key = TelegamiSessionKey.From(message);
+            var session = await SessionsProvider.GetAsync(key);
 
-            await _pipeline(messageContext);
+            if (session is null)
+            {
+                session = new TelegamiSession();
+            }
+
+            await using var scope = ServiceProvider.CreateAsyncScope();
+            var messageContext = new MessageContext(this, update, message, _botUser!, scope, session);
+
+            try
+            {
+                await _pipeline(messageContext);
+            }
+            finally
+            {
+                await SessionsProvider.SetAsync(key, session);
+            }
         }
 
         private Task ErrorHandler(ITelegramBotClient arg1, Exception arg2, HandleErrorSource arg3, CancellationToken arg4)

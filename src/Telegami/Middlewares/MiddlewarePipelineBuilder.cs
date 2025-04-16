@@ -44,7 +44,7 @@ class MiddlewarePipelineBuilder
 
     public MessageContextDelegate Build()
     {
-        MessageContextDelegate app = context => Task.CompletedTask; // Terminal middleware
+        MessageContextDelegate app = _ => Task.CompletedTask; // Terminal middleware
 
         // Build the pipeline in reverse order
         for (int i = _components.Count - 1; i >= 0; i--)

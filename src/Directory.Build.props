@@ -14,6 +14,19 @@
     <!-- NU1008 - should not define the version on the PackageReference items but on the PackageVersion items -->
     <!-- NU1504 - Duplicate 'PackageReference' items found -->
     <!-- NU1506 - Duplicate 'PackageVersion' items found -->
-    <WarningsAsErrors>$(WarningsAsErrors);NU1506;NU1008;NU1504</WarningsAsErrors>
+    <!-- CS8618 - Non-nullable field must contain a non-null value when exiting constructor -->
+    <!-- CS0168 - The variable is declared but never used -->
+    <!-- CS8622 - Nullability of reference types in type of parameter  doesn't match the target delegate (possibly because of nullability attributes) -->
+    <!-- CS1998 - This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread. -->
+    <!-- CS0108 - hides inherited member. Use the new keyword if hiding was intended. -->
+    <!-- CS8625 - Cannot convert null literal to non-nullable reference type. -->
+    <!-- CS8600 - Converting null literal or possible null value to non-nullable type. -->
+    <!-- CS8601 - Possible null reference assignment. -->
+    <!-- CS8602 - Dereference of a possibly null reference. -->
+    <!-- CS8603 - Possible null reference return. -->
+    <!-- CS8604 - Possible null reference argument for parameter. -->
+    <!-- CS8620 - Argument of type cannot be used for parameter 'source' of type -->
+    <!-- Remove unnecessary using directives (IDE0005) -->
+    <WarningsAsErrors>$(WarningsAsErrors);IDE0005;NU1506;NU1008;NU1504;CS8618;CS0168;CS8622;CS1998;CS0108;CS8625;CS8600;CS8601;CS8602;CS8603;CS8604;CS8620</WarningsAsErrors>
   </PropertyGroup>
 </Project>

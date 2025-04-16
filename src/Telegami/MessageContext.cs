@@ -19,13 +19,15 @@ public sealed class MessageContext
 
     public BotCommand? BotCommand { get; }
 
-    internal MessageContext(TelegamiBot bot, Update update, Message message, User botUser, AsyncServiceScope scope)
+    internal MessageContext(TelegamiBot bot, Update update, Message message, User botUser, AsyncServiceScope scope,
+        ITelegamiSession session)
     {
         Bot = bot;
         Update = update;
         Message = message;
         BotUser = botUser;
         Scope = scope;
+        Session = session;
 
         if (BotCommand.TryParse(message.Text, out var botCommand))
         {

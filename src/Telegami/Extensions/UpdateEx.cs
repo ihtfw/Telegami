@@ -15,11 +15,11 @@ namespace Telegami.Extensions
 
         public static long? ResolveChatId(this Update update)
         {
-            return update.Message?.Chat?.Id
+            return update.Message?.Chat.Id
                    ?? update.EditedMessage?.Chat.Id
                    ?? update.BusinessConnection?.UserChatId
-                   ?? update.BusinessMessage?.Chat?.Id
-                   ?? update.EditedBusinessMessage?.Chat?.Id
+                   ?? update.BusinessMessage?.Chat.Id
+                   ?? update.EditedBusinessMessage?.Chat.Id
                    ?? update.CallbackQuery?.Message?.Chat.Id;
         }
     }

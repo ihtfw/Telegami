@@ -14,12 +14,12 @@ namespace Telegami.Sessions
         {
             if (value is string strValue)
             {
-                telegamiSession.KeyValues.AddOrUpdate(key, strValue, ((s, s1) => strValue));
+                telegamiSession.KeyValues.AddOrUpdate(key, strValue, ((_, _) => strValue));
                 return;
             }
 
             var json = JsonSerializer.Serialize(value);
-            telegamiSession.KeyValues.AddOrUpdate(key, json, ((s, s1) => json));
+            telegamiSession.KeyValues.AddOrUpdate(key, json, ((_, _) => json));
         }
 
         public static void Set<T>(this ITelegamiSession telegamiSession, T value) where T : class
@@ -52,7 +52,7 @@ namespace Telegami.Sessions
 
         public static void Set(this ITelegamiSession telegamiSession, string key, string value)
         {
-            telegamiSession.KeyValues.AddOrUpdate(key, value, ((s, s1) => value));
+            telegamiSession.KeyValues.AddOrUpdate(key, value, ((_, _) => value));
         }
     }
 

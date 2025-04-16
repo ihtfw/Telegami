@@ -72,7 +72,7 @@ namespace Telegami.Middlewares
         {
             var resolvedMessagesHandler = _messagesHandler;
 
-            var sceneName = ctx.Session?.Scene;
+            var sceneName = ctx.Session.Scene;
             if (sceneName != null)
             {
                 if (_scenesManager.TryGet(sceneName, out var scene))

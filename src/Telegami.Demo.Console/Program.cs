@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
 using Telegami;
 using Telegami.Demo.Console.Middlewares;
 using Telegami.Scenes;
@@ -26,14 +25,14 @@ var bot = new TelegamiBot(token)
 bot.Use<LoggerMiddleware>();
 bot.Use<GlobalErrorHandlerMiddleware>();
 
-bot.Start(async (MessageContext ctx, MyCustomService service) =>
+bot.Start(async (MessageContext ctx, MyCustomService _) =>
 {
     await ctx.ReplyAsync("Hello! I'm a bot. How can I help you?");
 });
 
-bot.Help(async (MessageContext ctx) => { await ctx.ReplyAsync("This is a help message."); });
+bot.Help(async ctx => { await ctx.ReplyAsync("This is a help message."); });
 
-bot.Settings(async (MessageContext ctx) => { await ctx.ReplyAsync("This is a settings message."); });
+bot.Settings(async ctx => { await ctx.ReplyAsync("This is a settings message."); });
 
 bot.Command("custom",
     async (MessageContext ctx) =>
@@ -51,7 +50,7 @@ bot.Command("error", () => throw new Exception("This is a test exception"));
 
 bot.On(MessageType.Sticker, async (MessageContext ctx) => { await ctx.ReplyAsync($"What a nice sticker!"); });
 
-bot.Hears("hello", async (MessageContext ctx, MyCustomService myCustomService) => { await ctx.ReplyAsync("World!"); });
+bot.Hears("hello", async (MessageContext ctx, MyCustomService _) => { await ctx.ReplyAsync("World!"); });
 
 bot.Hears("world", async ctx => { await ctx.ReplyAsync("hello!"); });
 
@@ -174,10 +173,6 @@ Console.ReadKey();
 
 class Person
 {
-    public Person()
-    {
-    }
-
     public string? Name { get; set; }
     public string? LastName { get; set; }
     public int? Age { get; set; }
