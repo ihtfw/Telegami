@@ -25,13 +25,13 @@ jobs:
           echo "VERSION=$TAG" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies
-        run: dotnet restore src/Telegami/Telegami.sln
+        run: dotnet restore src/Telegami.sln
 
       - name: Build
-        run: dotnet build src/Telegami/Telegami.sln --configuration Release --no-restore
+        run: dotnet build src/Telegami.sln --configuration Release --no-restore
 
       - name: Pack
-        run: dotnet pack src/Telegami/Telegami.sln --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+        run: dotnet pack src/Telegami.sln --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
 
       - name: Push to NuGet
         run: |
