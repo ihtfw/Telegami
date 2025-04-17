@@ -3,7 +3,7 @@
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <PackageDescription>Library to simplify creation of Telegram bots.</PackageDescription>
-    <PackageTags>csharp;library;telegram;bot</PackageTags>
+    <PackageTags>csharp;library;telegram;bot;telegami</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- Placeholder, gets overridden -->
     <Version>0.0.0</Version>

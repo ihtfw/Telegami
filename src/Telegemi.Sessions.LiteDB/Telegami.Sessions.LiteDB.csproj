@@ -3,14 +3,18 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
-    <PackageDescription>Library to replace in memory session storage with LiteDB</PackageDescription>
-    <PackageTags>csharp;library;telegram;bot;litedb</PackageTags>
+    <PackageDescription>Library to replace in memory session storage with LiteDB for Telegami bot</PackageDescription>
+    <PackageTags>csharp;library;telegram;bot;litedb;telegami</PackageTags>
     <!-- Placeholder, gets overridden -->
     <Version>0.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LiteDB" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
