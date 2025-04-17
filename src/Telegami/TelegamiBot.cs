@@ -24,13 +24,19 @@ namespace Telegami
 
         private readonly List<Func<Update, Message, Exception, Task>> _unhandledExceptionHandlers = new();
 
-        private User? _botUser;
+        /// <summary>
+        /// Will be available after LaunchAsync()
+        /// </summary>
+        public User? BotUser { get; private set; }
 
-        internal ITelegramBotClient Client { get; }
+        /// <summary>
+        /// Original Telegram.Bot client, so you can use it directly if needed. Use with care. 
+        /// </summary>
+        public ITelegramBotClient Client { get; }
 
         public TelegamiBot(IServiceProvider serviceProvider, string token) :
-            this(serviceProvider, DefaultKey, new TelegamiBotConfig()
-        {
+            this(serviceProvider, DefaultKey, new TelegamiBotConfig
+            {
             Token = token
         })
         {
@@ -53,17 +59,23 @@ namespace Telegami
             ServiceProvider = serviceProvider;
             Key = key;
             Client = new TelegramBotClient(new TelegramBotClientOptions(config.Token));
+
+            SessionsProvider = serviceProvider.GetKeyedService<ITelegamiSessionsProvider>(key) ?? new InMemoryTelegamiSessionsProvider();
         }
 
         public string Key { get; }
 
+        /// <summary>
+        /// Add your handler if something goes wrong and no one handled it, this is the last chance to handle exception.
+        /// </summary>
+        /// <param name="handler"></param>
         public void OnUnhandledException(Func<Update, Message, Exception, Task> handler)
         {
             _unhandledExceptionHandlers.Add(handler);
         }
 
         public IServiceProvider ServiceProvider { get; }
-        public ITelegamiSessionsProvider SessionsProvider { get; init; } = new InMemoryTelegamiSessionsProvider();
+        public ITelegamiSessionsProvider SessionsProvider { get; }
 
         /// <summary>
         /// Will build pipeline, will get bot user from api and start receiving updates.
@@ -71,12 +83,12 @@ namespace Telegami
         /// <returns></returns>
         public async Task LaunchAsync()
         {
-            if (_botUser != null)
+            if (BotUser != null)
             {
                 return;
             }
 
-            _botUser = await Client.GetMe();
+            BotUser = await Client.GetMe();
 
             // default middlewares
             // _pipelineBuilder.Use(() => new TelegamiSessionMiddleware(SessionsProvider));
@@ -115,7 +127,7 @@ namespace Telegami
                 }
 
                 await using var scope = ServiceProvider.CreateAsyncScope();
-                var messageContext = new MessageContext(this, update, message, _botUser!, scope, session);
+                var messageContext = new MessageContext(this, update, message, BotUser!, scope, session);
 
                 try
                 {
@@ -142,8 +154,8 @@ namespace Telegami
             }
         }
 
-        private Task ErrorHandler(ITelegramBotClient arg1, Exception arg2, HandleErrorSource arg3,
-            CancellationToken arg4)
+        private Task ErrorHandler(ITelegramBotClient telegramBotClient, Exception exception, HandleErrorSource handleErrorSource,
+            CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
@@ -152,7 +164,7 @@ namespace Telegami
 
         internal async Task LeaveCurrentSceneAsync(MessageContext ctx)
         {
-            var currentScene = ctx.Session.CurrentScene();
+            var currentScene = ctx.Session.CurrentSceneName();
             if (currentScene == null)
             {
                 return;
@@ -165,11 +177,24 @@ namespace Telegami
             }
 
             // remove it from session
-            ctx.Session.Scenes.TryPop(out _);
+            ctx.Session.DropCurrentScene();
             if (ctx.Session.Scenes.Count == 0)
             {
                 // if all scenes are popped, we can reset session to clear data
                 ctx.Session.Reset();
+            }
+            else
+            {
+                var parentSceneName = ctx.Session.CurrentSceneName();
+                if (parentSceneName == null)
+                {
+                    return;
+                }
+                
+                if (_scenesManager.TryGet(parentSceneName, out var parentScene))
+                {
+                    await MessageHandlerUtils.InvokeAsync(ctx, parentScene!.ReEnterHandler);
+                }
             }
         }
 
@@ -181,7 +206,7 @@ namespace Telegami
                 return;
             }
 
-            ctx.Session.Scenes.Push(new TelegamiSessionScene()
+            ctx.Session.Scenes.Add(new TelegamiSessionScene
             {
                 Name = sceneName,
                 StageIndex = 0
@@ -193,6 +218,15 @@ namespace Telegami
         public void AddScene(IScene scene)
         {
             _scenesManager.Add(scene);
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (scene is IHaveSubScenes haveSubScenes)
+            {
+                foreach (var subScene in haveSubScenes.SubScenes())
+                {
+                    AddScene(subScene);
+                }
+            }
         }
 
         #endregion

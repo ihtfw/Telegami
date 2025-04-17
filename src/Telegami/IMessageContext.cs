@@ -11,25 +11,28 @@ public class WizardContext
 
     public void Next()
     {
-        if (Ctx.Session.Scenes.TryPeek(out var scene))
+        var current = Ctx.Session.Scenes.LastOrDefault();
+        if (current != null)
         {
-            scene.StageIndex++;
+            current.StageIndex++;
         }
     }
 
     public void Prev()
     {
-        if (Ctx.Session.Scenes.TryPeek(out var scene))
+        var current = Ctx.Session.Scenes.LastOrDefault();
+        if (current != null)
         {
-            scene.StageIndex--;
+            current.StageIndex--;
         }
     }
 
     public void Set(int index)
     {
-        if (Ctx.Session.Scenes.TryPeek(out var scene))
+        var current = Ctx.Session.Scenes.LastOrDefault();
+        if (current != null)
         {
-            scene.StageIndex = index;
+            current.StageIndex = index;
         }
     }
 
@@ -37,9 +40,10 @@ public class WizardContext
     {
         get
         {
-            if (Ctx.Session.Scenes.TryPeek(out var scene))
+            var current = Ctx.Session.Scenes.LastOrDefault();
+            if (current != null)
             {
-                return scene.StageIndex;
+                return current.StageIndex;
             }
             return 0;
         }

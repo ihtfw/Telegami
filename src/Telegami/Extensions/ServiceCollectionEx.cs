@@ -4,15 +4,34 @@ using Telegami.Commands;
 
 namespace Telegami.Extensions;
 
-public static class ServiceCollectionEx
+public class TelegamiBotBuilder
 {
-    public static IServiceCollection AddTelegamiCommands(this IServiceCollection serviceCollection, params Type[] assemblyMarkers)
+    public string Key { get; }
+    public IServiceCollection ServiceCollection { get; }
+
+    public TelegamiBotBuilder(string key, IServiceCollection serviceCollection)
     {
-        var assemblies = assemblyMarkers.Select(x => x.Assembly).Distinct().ToArray();
-        return serviceCollection.AddTelegamiCommands(assemblies);
+        Key = key;
+        ServiceCollection = serviceCollection;
     }
 
-    public static IServiceCollection AddTelegamiCommands(this IServiceCollection serviceCollection, params Assembly[] assemblies)
+    /// <summary>
+    /// Should be invoked only once per assembly!
+    /// </summary>
+    /// <param name="assemblyMarkers"></param>
+    /// <returns></returns>
+    public TelegamiBotBuilder AddCommands(params Type[] assemblyMarkers)
+    {
+        var assemblies = assemblyMarkers.Select(x => x.Assembly).Distinct().ToArray();
+        return AddCommands(assemblies);
+    }
+
+    /// <summary>
+    /// Should be invoked only once per assembly!
+    /// </summary>
+    /// <param name="assemblies"></param>
+    /// <returns></returns>
+    public TelegamiBotBuilder AddCommands(params Assembly[] assemblies)
     {
         var commandTypes = assemblies
             .SelectMany(x => x.GetTypes())
@@ -20,13 +39,16 @@ public static class ServiceCollectionEx
 
         foreach (var commandType in commandTypes)
         {
-            serviceCollection.AddScoped(commandType);
+            ServiceCollection.AddScoped(commandType);
         }
 
-        return serviceCollection;
+        return this;
     }
+}
 
-    public static IServiceCollection AddTelegamiBot(this IServiceCollection serviceCollection, string token)
+public static class ServiceCollectionEx
+{
+    public static TelegamiBotBuilder AddTelegamiBot(this IServiceCollection serviceCollection, string token)
     {
         return serviceCollection.AddTelegamiBot(TelegamiBot.DefaultKey, config =>
         {
@@ -34,7 +56,7 @@ public static class ServiceCollectionEx
         });
     }
 
-    public static IServiceCollection AddTelegamiBot(this IServiceCollection serviceCollection, string key, string token)
+    public static TelegamiBotBuilder AddTelegamiBot(this IServiceCollection serviceCollection, string key, string token)
     {
         return serviceCollection.AddTelegamiBot(key, config =>
         {
@@ -42,12 +64,12 @@ public static class ServiceCollectionEx
         });
     }
 
-    public static IServiceCollection AddTelegamiBot(this IServiceCollection serviceCollection, Action<TelegamiBotConfig> configure)
+    public static TelegamiBotBuilder AddTelegamiBot(this IServiceCollection serviceCollection, Action<TelegamiBotConfig> configure)
     {
         return AddTelegamiBot(serviceCollection, TelegamiBot.DefaultKey, configure);
     }
 
-    public static IServiceCollection AddTelegamiBot(this IServiceCollection serviceCollection, string key, Action<TelegamiBotConfig> configure)
+    public static TelegamiBotBuilder AddTelegamiBot(this IServiceCollection serviceCollection, string key, Action<TelegamiBotConfig> configure)
     {
         if (serviceCollection.All(x => x.ServiceType != typeof(TelegamiBotsManager)))
         {
@@ -62,7 +84,7 @@ public static class ServiceCollectionEx
             return new TelegamiBot(x, key, config);
         });
 
-        return serviceCollection;
+        return new TelegamiBotBuilder(key, serviceCollection);
     }
 
 }

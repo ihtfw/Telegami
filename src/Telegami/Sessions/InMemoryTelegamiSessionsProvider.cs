@@ -5,38 +5,27 @@ namespace Telegami.Sessions;
 
 public class InMemoryTelegamiSessionsProvider : ITelegamiSessionsProvider
 {
-    private readonly ConcurrentDictionary<TelegamiSessionKey, (Type type, string data)> _sessions = new();
+    private readonly ConcurrentDictionary<TelegamiSessionKey, string> _sessions = new();
 
-    public Task<ITelegamiSession?> GetAsync(TelegamiSessionKey key)
+    public Task<TelegamiSession?> GetAsync(TelegamiSessionKey key)
     {
-        if (_sessions.TryGetValue(key, out var item))
+        if (_sessions.TryGetValue(key, out var json))
         {
-            var type = item.type;
-            var json = item.data;
-
-            var jsonSession = JsonSerializer.Deserialize(json, type) as ITelegamiSession;
+            var jsonSession = JsonSerializer.Deserialize<TelegamiSession>(json);
             if (jsonSession == null)
             {
-                return Task.FromResult<ITelegamiSession?>(null);
+                return Task.FromResult<TelegamiSession?>(null);
             }
 
-            if (jsonSession.Scenes.Count > 1)
-            {
-                // workaround to fix deserialization order problem
-                var scenes = jsonSession.Scenes.ToArray();
-                jsonSession.Scenes.Clear();
-                jsonSession.Scenes.PushRange(scenes);
-            }
-
-            return Task.FromResult<ITelegamiSession?>(jsonSession);
+            return Task.FromResult<TelegamiSession?>(jsonSession);
         }
 
-        return Task.FromResult<ITelegamiSession?>(null);
+        return Task.FromResult<TelegamiSession?>(null);
     }
 
-    public Task SetAsync(TelegamiSessionKey key, ITelegamiSession session)
+    public Task SetAsync(TelegamiSessionKey key, TelegamiSession session)
     {
-        _sessions[key] = (session.GetType(), JsonSerializer.Serialize(session));
+        _sessions[key] = JsonSerializer.Serialize(session);
         return Task.CompletedTask;
     }
 }

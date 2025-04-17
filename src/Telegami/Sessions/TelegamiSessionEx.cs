@@ -4,51 +4,57 @@ namespace Telegami.Sessions;
 
 public static class TelegamiSessionEx
 {
-    public static void DropCurrentScene(this ITelegamiSession telegamiSession)
+    internal static void DropCurrentScene(this TelegamiSession telegamiSession)
     {
-        telegamiSession.Scenes.TryPop(out _);
-    }
-
-    public static string? CurrentScene(this ITelegamiSession telegamiSession)
-    {
-        if (telegamiSession.Scenes.TryPeek(out var scene))
+        if (telegamiSession.Scenes.Count < 2)
         {
-            return scene.Name;
+            telegamiSession.Scenes.Clear();
+            return;
         }
 
-        return null;
+        telegamiSession.Scenes.RemoveAt(telegamiSession.Scenes.Count - 1);
     }
 
-    public static string? Get(this ITelegamiSession telegamiSession, string key)
+    public static string? CurrentSceneName(this TelegamiSession telegamiSession)
+    {
+        if (telegamiSession.Scenes.Count == 0)
+        {
+            return null;
+        }
+
+        return telegamiSession.Scenes[^1].Name;
+    }
+
+    public static string? Get(this TelegamiSession telegamiSession, string key)
     {
         return telegamiSession.KeyValues.GetValueOrDefault(key);
     }
 
-    public static void Set<T>(this ITelegamiSession telegamiSession, string key, T value) where T : class
+    public static void Set<T>(this TelegamiSession telegamiSession, string key, T value) where T : class
     {
         if (value is string strValue)
         {
-            telegamiSession.KeyValues.AddOrUpdate(key, strValue, ((_, _) => strValue));
+            telegamiSession.KeyValues[key] = strValue;
             return;
         }
 
         var json = JsonSerializer.Serialize(value);
-        telegamiSession.KeyValues.AddOrUpdate(key, json, ((_, _) => json));
+        telegamiSession.KeyValues[key] = json;
     }
 
-    public static void Set<T>(this ITelegamiSession telegamiSession, T value) where T : class
+    public static void Set<T>(this TelegamiSession telegamiSession, T value) where T : class
     {
         var key = typeof(T).FullName ?? typeof(T).Name;
         Set(telegamiSession, key, value);
     }
 
-    public static T? Get<T>(this ITelegamiSession telegamiSession) where T : class
+    public static T? Get<T>(this TelegamiSession telegamiSession) where T : class
     {
         var key = typeof(T).FullName ?? typeof(T).Name;
         return telegamiSession.Get<T>(key);
     }
 
-    public static T? Get<T>(this ITelegamiSession telegamiSession, string key) where T : class
+    public static T? Get<T>(this TelegamiSession telegamiSession, string key) where T : class
     {
         if (!telegamiSession.KeyValues.TryGetValue(key, out var value))
         {
@@ -64,8 +70,8 @@ public static class TelegamiSessionEx
     }
 
 
-    public static void Set(this ITelegamiSession telegamiSession, string key, string value)
+    public static void Set(this TelegamiSession telegamiSession, string key, string value)
     {
-        telegamiSession.KeyValues.AddOrUpdate(key, value, ((_, _) => value));
+        telegamiSession.KeyValues[key] = value;
     }
 }

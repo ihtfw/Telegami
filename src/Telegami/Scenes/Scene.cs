@@ -12,8 +12,10 @@ namespace Telegami.Scenes
         public string Name { get; }
 
         private IMessageHandler EnterHandler { get; set; } = EmptyMessageHandler.Instance;
+        private IMessageHandler ReEnterHandler { get; set; } = EmptyMessageHandler.Instance;
 
         IMessageHandler IScene.EnterHandler => EnterHandler;
+        IMessageHandler IScene.ReEnterHandler => ReEnterHandler;
 
         private IMessageHandler LeaveHandler { get; set; } = EmptyMessageHandler.Instance;
 
@@ -39,19 +41,58 @@ namespace Telegami.Scenes
             Leave((Delegate)func);
         }
 
+        /// <summary>
+        /// Invoked on Scene Enter via EnterSceneAsync() method
+        /// </summary>
+        /// <param name="handler"></param>
         public void Enter(Delegate handler)
         {
             EnterHandler = new DelegateMessageHandler(handler);
         }
 
-        public void Enter(Func<Task> func)
+        /// <summary>
+        /// Invoked on Scene Enter via EnterSceneAsync() method
+        /// </summary>
+        /// <param name="handler"></param>
+        public void Enter(Func<Task> handler)
         {
-            Enter((Delegate)func);
+            Enter((Delegate)handler);
         }
 
-        public void Enter(Func<MessageContext, Task> func)
+        /// <summary>
+        /// Invoked on Scene Enter via EnterSceneAsync() method
+        /// </summary>
+        /// <param name="handler"></param>
+        public void Enter(Func<MessageContext, Task> handler)
         {
-            Enter((Delegate)func);
+            Enter((Delegate)handler);
+        }
+
+        /// <summary>
+        /// Invoked after returning back from sub scene
+        /// </summary>
+        /// <param name="handler"></param>
+        public void ReEnter(Delegate handler)
+        {
+            ReEnterHandler = new DelegateMessageHandler(handler);
+        }
+
+        /// <summary>
+        /// Invoked after returning back from sub scene
+        /// </summary>
+        /// <param name="handler"></param>
+        public void ReEnter(Func<Task> handler)
+        {
+            ReEnter((Delegate)handler);
+        }
+        
+        /// <summary>
+        /// Invoked after returning back from sub scene
+        /// </summary>
+        /// <param name="handler"></param>
+        public void ReEnter(Func<MessageContext, Task> handler)
+        {
+            ReEnter((Delegate)handler);
         }
 
         #region IMessagesHandler

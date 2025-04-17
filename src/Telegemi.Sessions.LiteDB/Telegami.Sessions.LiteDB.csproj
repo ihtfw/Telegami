@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>Library to replace in memory session storage with LiteDB</PackageDescription>
+    <PackageTags>csharp;library;telegram;bot;litedb</PackageTags>
+    <!-- Placeholder, gets overridden -->
+    <Version>0.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiteDB" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Telegami\Telegami.csproj" />
+  </ItemGroup>
+
+</Project>

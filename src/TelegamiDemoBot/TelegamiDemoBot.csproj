@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Telegami\Telegami.csproj" />
+    <ProjectReference Include="..\Telegemi.Sessions.LiteDB\Telegami.Sessions.LiteDB.csproj" />
   </ItemGroup>
 
 </Project>

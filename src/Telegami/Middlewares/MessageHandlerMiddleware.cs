@@ -18,7 +18,7 @@ namespace Telegami.Middlewares
         {
             var resolvedMessagesHandler = _messagesHandler;
 
-            var sceneName = ctx.Session.CurrentScene();
+            var sceneName = ctx.Session.CurrentSceneName();
             while (sceneName != null)
             {
                 if (_scenesManager.TryGet(sceneName, out var scene))
@@ -28,7 +28,7 @@ namespace Telegami.Middlewares
                 }
 
                 ctx.Session.DropCurrentScene();
-                sceneName = ctx.Session.CurrentScene();
+                sceneName = ctx.Session.CurrentSceneName();
             }
             
             foreach (var messageHandler in resolvedMessagesHandler.Handlers)

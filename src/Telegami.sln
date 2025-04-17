@@ -13,6 +13,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami.Demo.Console", "Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami", "Telegami\Telegami.csproj", "{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{69368EFC-FB38-4F3A-B580-598500E2C4F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegamiDemoBot", "TelegamiDemoBot\TelegamiDemoBot.csproj", "{61036AE1-69C5-4120-A09F-04F7608BFD02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami.Sessions.LiteDB", "Telegemi.Sessions.LiteDB\Telegami.Sessions.LiteDB.csproj", "{0735878C-5B1D-4505-993B-C3F4BB10A802}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +33,20 @@ Global
 		{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9F130AAF-DC96-4FD7-BAD8-4E020F1B8F76} = {69368EFC-FB38-4F3A-B580-598500E2C4F8}
+		{61036AE1-69C5-4120-A09F-04F7608BFD02} = {69368EFC-FB38-4F3A-B580-598500E2C4F8}
 	EndGlobalSection
 EndGlobal

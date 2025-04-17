@@ -2,7 +2,7 @@
 
 public interface ITelegamiSessionsProvider
 {
-    Task<ITelegamiSession?> GetAsync(TelegamiSessionKey key);
+    Task<TelegamiSession?> GetAsync(TelegamiSessionKey key);
 
-    Task SetAsync(TelegamiSessionKey key, ITelegamiSession session);
+    Task SetAsync(TelegamiSessionKey key, TelegamiSession session);
 }

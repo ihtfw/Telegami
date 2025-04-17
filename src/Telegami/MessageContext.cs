@@ -20,7 +20,7 @@ public sealed class MessageContext
     public BotCommand? BotCommand { get; }
 
     internal MessageContext(TelegamiBot bot, Update update, Message message, User botUser, AsyncServiceScope scope,
-        ITelegamiSession session)
+        TelegamiSession session)
     {
         Bot = bot;
         Update = update;
@@ -35,7 +35,7 @@ public sealed class MessageContext
         }
     }
 
-    public ITelegamiSession Session { get; set; }
+    public TelegamiSession Session { get; set; }
 
     public bool IsCommand => BotCommand != null;
 

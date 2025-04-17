@@ -1,6 +1,7 @@
-﻿using Telegram.Bot.Types.Enums;
+﻿using Telegami.Middlewares;
+using Telegram.Bot.Types.Enums;
 
-namespace Telegami.Middlewares;
+namespace Telegami;
 
 public static class MessagesHandlerEx
 {

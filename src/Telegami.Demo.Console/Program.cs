@@ -4,7 +4,6 @@ using Telegami.Demo.Console;
 using Telegami.Demo.Console.Commands;
 using Telegami.Demo.Console.Middlewares;
 using Telegami.Extensions;
-using Telegami.Middlewares;
 using Telegami.Scenes;
 using Telegami.Sessions;
 using Telegram.Bot.Types.Enums;
@@ -23,7 +22,7 @@ serviceCollection
     {
         config.Token = token;
     })
-    .AddTelegamiCommands(typeof(Program));
+    .AddCommands(typeof(Program));
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
