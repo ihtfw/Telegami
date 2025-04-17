@@ -1,3 +1,4 @@
+
 # Telegami
 
 A simple library for building Telegram bots.
@@ -25,14 +26,13 @@ Inspired by the Node.js [Telegraf](https://github.com/telegraf/telegraf) library
 ## Getting Started
 
 ```csharp
-using Microsoft.Extensions.DependencyInjection;
-
 var serviceCollection = new ServiceCollection();
-// Register your services here if needed
+serviceCollection.AddTelegamiBot("BOT_TOKEN_FROM_BOT_FATHER");
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var bot = new TelegamiBot(serviceProvider, "BOT_TOKEN_FROM_BOT_FATHER");
+var botsManager = serviceProvider.GetRequiredService<TelegamiBotsManager>();
+var bot = botsManager.Get();
 
 // Handle /start command
 bot.Start(async ctx =>
@@ -46,7 +46,7 @@ bot.Command("custom", async ctx =>
     await ctx.ReplyAsync($"This is a custom command handler. Arguments: '{ctx.BotCommand!.Arguments}'");
 });
 
-await bot.LaunchAsync();
+await botsManager.LaunchAsync();
 ```
 
 That's it! Bot is working and can handle **/start** and **/custom** commands.
@@ -64,18 +64,21 @@ bot.On(MessageType.Text, async ctx => { await ctx.ReplyAsync("Echo: " + ctx.Mess
 bot.On(async ctx => { await ctx.ReplyAsync("Type: " + ctx.Message.Type); });
 ```
 
-## Dependecy injection
+## Dependency injection
 
 ```CSharp
 class MyCustomService{}
 
 var serviceCollection = new ServiceCollection();
+serviceCollection.AddTelegamiBot("BOT_TOKEN_FROM_BOT_FATHER");
+
 // register service
 serviceCollection.AddScoped<MyCustomService>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var bot = new TelegamiBot(serviceProvider, "BOT_TOKEN_FROM_BOT_FATHER");
+var botsManager = serviceProvider.GetRequiredService<TelegamiBotsManager>();
+var bot = botsManager.Get();
 
 // ask for it!
 bot.Command("dependency", async (MessageContext ctx, MyCustomService myCustomService)  =>
@@ -88,10 +91,10 @@ bot.Command("dependency", async (MessageContext ctx, MyCustomService myCustomSer
 
 # Advanced scenarios
 
-Often is is neccecary to interact with the user and not just process command, i.e. collect name, last name and age.
-That's why we have Scene. Scene is bounded to user id, chat id and thread id, that means that different users can interect and each one will have it's one data. Also when user is in Scene, all messages are handled by scene, not by bot.
+Often, it is necessary to interact with the user and not just process commands (e.g., collect name, last name, and age).  
+That's why we have Scene. Scene is bound to the user ID, chat ID, and thread ID, which means that different users can interact, and each one will have their own data. Also, when a user is in a Scene, all messages are handled by the scene, not by the bot.
 
-Let's check out 2 appoaches Scene and WizardScene.
+Let's check out two approaches: Scene and WizardScene.
 
 ## Scene
 
@@ -157,11 +160,10 @@ bot.AddScene(personCardScene);
 
 ## WizardScene
 
-Have stages, that can be invoked one by one. Let's see same example with this approach.
-For wizard we have special class WizardContext to track out wizard step and WizardContext<TState> to track step and also have strongly typed state.
+`WizardScene` has stages that can be invoked one by one. Let’s see the same example with this approach.  
+For the wizard, we have a special class, `WizardContext`, to track the wizard's step, and `WizardContext<TState>` to track the step and provide a strongly-typed state.
 
 ```CSharp
-
 // let's add command, so we can start scene
 bot.Command("person_wizard", async ctx => { await ctx.EnterSceneAsync("person_wizard_scene"); });
 
@@ -224,22 +226,25 @@ var wizardScene = new WizardScene("person_wizard_scene",
 );
 
 bot.AddScene(wizardScene);
-
 ```
 
 # Middleware
 
-Inspired by ASP.NET
+Inspired by `ASP.NET`
 
 ## Error handler example
 
-Same logic as in ASP.NET every middleware have next delegate, so we can process MessageContext.
+Same logic as in `ASP.NET` every middleware have next delegate, so we can process `MessageContext`.
 
 ```CSharp
+var serviceCollection = new ServiceCollection();
+serviceCollection.AddTelegamiBot("BOT_TOKEN_FROM_BOT_FATHER");
 
-//.. other code
+var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var bot = new TelegamiBot(serviceProvider, token);
+var botsManager = serviceProvider.GetRequiredService<TelegamiBotsManager>();
+
+var bot = botsManager.Get();
 bot.Use<GlobalErrorHandlerMiddleware>();
 
 //.. other code
