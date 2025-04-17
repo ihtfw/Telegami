@@ -1,7 +1,9 @@
 <Project>
   <PropertyGroup>
     <LangVersion>12</LangVersion>
+    <IsPackable>false</IsPackable>
     <Authors>ihtfw</Authors>
+    <Company>ihtfw</Company>
     <PackageProjectUrl>https://github.com/ihtfw/Teligami</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ihtfw/Teligami</RepositoryUrl>
     <ImplicitUsings>enable</ImplicitUsings>

@@ -1,9 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>Library to simplify creation of Telegram bots.</PackageDescription>
+    <PackageTags>csharp;library;telegram;bot</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- Placeholder, gets overridden -->
+    <Version>0.0.0</Version>
+    <PackageIcon>logo-package.png</PackageIcon>
+    <PackageIconUrl>https://github.com/ihtfw/Teligami/raw/main/assets/logo-package.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\logo-package.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Telegram.Bot" />
   </ItemGroup>
 </Project>
