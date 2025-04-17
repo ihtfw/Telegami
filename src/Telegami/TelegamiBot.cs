@@ -22,6 +22,8 @@ namespace Telegami
         private readonly MiddlewarePipelineBuilder _pipelineBuilder = new();
         private MessageContextDelegate _pipeline = _ => Task.CompletedTask;
 
+        private readonly List<Func<Update, Message, Exception, Task>> _unhandledExceptionHandlers = new();
+
         private User? _botUser;
 
         internal ITelegramBotClient Client { get; }
@@ -54,6 +56,11 @@ namespace Telegami
         }
 
         public string Key { get; }
+
+        public void OnUnhandledException(Func<Update, Message, Exception, Task> handler)
+        {
+            _unhandledExceptionHandlers.Add(handler);
+        }
 
         public IServiceProvider ServiceProvider { get; }
         public ITelegamiSessionsProvider SessionsProvider { get; init; } = new InMemoryTelegamiSessionsProvider();
@@ -89,29 +96,49 @@ namespace Telegami
                 return;
             }
 
-            if (message.From?.IsBot == true)
+            if (_config.IgnoreBotMessages)
             {
-                return;
+                if (message.From?.IsBot == true)
+                {
+                    return;
+                }
             }
-
-            var key = TelegamiSessionKey.From(message);
-            var session = await SessionsProvider.GetAsync(key);
-
-            if (session is null)
-            {
-                session = new TelegamiSession();
-            }
-
-            await using var scope = ServiceProvider.CreateAsyncScope();
-            var messageContext = new MessageContext(this, update, message, _botUser!, scope, session);
 
             try
             {
-                await _pipeline(messageContext);
+                var key = TelegamiSessionKey.From(message);
+                var session = await SessionsProvider.GetAsync(key);
+
+                if (session is null)
+                {
+                    session = new TelegamiSession();
+                }
+
+                await using var scope = ServiceProvider.CreateAsyncScope();
+                var messageContext = new MessageContext(this, update, message, _botUser!, scope, session);
+
+                try
+                {
+                    await _pipeline(messageContext);
+                }
+                finally
+                {
+                    await SessionsProvider.SetAsync(key, session);
+                }
             }
-            finally
+            catch (Exception e)
             {
-                await SessionsProvider.SetAsync(key, session);
+                foreach (var unhandledExceptionHandler in _unhandledExceptionHandlers)
+                {
+                    try
+                    {
+                        await unhandledExceptionHandler(update, message, e);
+                    }
+                    catch
+                    {
+                        // ignore this one
+                    }
+                }
             }
         }
 
