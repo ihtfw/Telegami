@@ -1,4 +1,5 @@
-﻿using Telegami.Middlewares;
+﻿using Telegami.MessageHandlers;
+using Telegami.Middlewares;
 
 namespace Telegami.Scenes;
 

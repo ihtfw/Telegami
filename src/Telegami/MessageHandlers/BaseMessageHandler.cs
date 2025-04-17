@@ -1,4 +1,6 @@
-﻿namespace Telegami.MessageHandlers;
+﻿using Telegami.Middlewares;
+
+namespace Telegami.MessageHandlers;
 
 public class BaseMessageHandler : IMessageHandler
 {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Telegami.Commands;
 using Telegami.Extensions;
 using Telegami.Middlewares;
 using Telegami.Scenes;
@@ -12,6 +13,10 @@ namespace Telegami
 {
     public class TelegamiBot : IMessagesHandler
     {
+        public const string DefaultKey = "default";
+
+        // ReSharper disable once NotAccessedField.Local
+        private readonly TelegamiBotConfig _config;
         private readonly ScenesManager _scenesManager = new();
         private readonly MessagesHandler _messagesHandler = new();
         private readonly MiddlewarePipelineBuilder _pipelineBuilder = new();
@@ -21,11 +26,34 @@ namespace Telegami
 
         internal ITelegramBotClient Client { get; }
 
-        public TelegamiBot(IServiceProvider serviceProvider, string token)
+        public TelegamiBot(IServiceProvider serviceProvider, string token) :
+            this(serviceProvider, DefaultKey, new TelegamiBotConfig()
         {
-            ServiceProvider = serviceProvider;
-            Client = new TelegramBotClient(new TelegramBotClientOptions(token));
+            Token = token
+        })
+        {
+
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="key">name of the bot inside application, it can be anything</param>
+        /// <param name="config"></param>
+        public TelegamiBot(IServiceProvider serviceProvider, string key, TelegamiBotConfig config)
+        {
+            if (string.IsNullOrEmpty(config.Token))
+            {
+                throw new ArgumentException("Token is required", nameof(config.Token));
+            }
+
+            _config = config;
+            ServiceProvider = serviceProvider;
+            Key = key;
+            Client = new TelegramBotClient(new TelegramBotClientOptions(config.Token));
+        }
+
+        public string Key { get; }
 
         public IServiceProvider ServiceProvider { get; }
         public ITelegamiSessionsProvider SessionsProvider { get; init; } = new InMemoryTelegamiSessionsProvider();
@@ -36,12 +64,18 @@ namespace Telegami
         /// <returns></returns>
         public async Task LaunchAsync()
         {
+            if (_botUser != null)
+            {
+                return;
+            }
+
+            _botUser = await Client.GetMe();
+
             // default middlewares
             // _pipelineBuilder.Use(() => new TelegamiSessionMiddleware(SessionsProvider));
             _pipelineBuilder.Use(() => new MessageHandlerMiddleware(_messagesHandler, _scenesManager));
 
             _pipeline = _pipelineBuilder.Build();
-            _botUser = await Client.GetMe();
 
             Client.StartReceiving(UpdateHandler, ErrorHandler);
         }
@@ -161,6 +195,11 @@ namespace Telegami
         #region IMessagesHandler
 
         IReadOnlyList<IMessageHandler> IMessagesHandler.Handlers => _messagesHandler.Handlers;
+
+        public void Command<TCommandHandler>(string command) where TCommandHandler : ITelegamiCommandHandler
+        {
+            _messagesHandler.Command<TCommandHandler>(command);
+        }
 
         public void Command(string command, Delegate handler)
         {

@@ -1,4 +1,7 @@
-﻿using Telegram.Bot.Types.Enums;
+﻿using Telegami.Commands;
+using Telegami.MessageHandlers;
+using Telegami.Middlewares;
+using Telegram.Bot.Types.Enums;
 
 namespace Telegami.Scenes
 {
@@ -54,6 +57,11 @@ namespace Telegami.Scenes
         #region IMessagesHandler
 
         IReadOnlyList<IMessageHandler> IMessagesHandler.Handlers => _messagesHandler.Handlers;
+
+        public void Command<TCommandHandler>(string command) where TCommandHandler : ITelegamiCommandHandler
+        {
+            _messagesHandler.Command<TCommandHandler>(command);
+        }
 
         public void Command(string command, Delegate handler)
         {

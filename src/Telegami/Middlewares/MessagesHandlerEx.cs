@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types.Enums;
 
-namespace Telegami;
+namespace Telegami.Middlewares;
 
 public static class MessagesHandlerEx
 {

@@ -1,4 +1,6 @@
-﻿namespace Telegami.Scenes;
+﻿using Telegami.Middlewares;
+
+namespace Telegami.Scenes;
 
 public interface IScene : IMessagesHandler
 {

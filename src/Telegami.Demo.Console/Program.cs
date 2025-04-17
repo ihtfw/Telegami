@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Telegami;
 using Telegami.Demo.Console;
+using Telegami.Demo.Console.Commands;
 using Telegami.Demo.Console.Middlewares;
+using Telegami.Extensions;
+using Telegami.Middlewares;
 using Telegami.Scenes;
 using Telegami.Sessions;
 using Telegram.Bot.Types.Enums;
@@ -15,10 +18,17 @@ if (string.IsNullOrEmpty(token))
 
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddScoped<MyCustomService>();
+serviceCollection
+    .AddTelegamiBot("demo", config =>
+    {
+        config.Token = token;
+    })
+    .AddTelegamiCommands(typeof(Program));
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var bot = new TelegamiBot(serviceProvider, token);
+var botsManager = serviceProvider.GetRequiredService<TelegamiBotsManager>();
+var bot = botsManager.Get("demo");
 
 bot.Use<LoggerMiddleware>();
 bot.Use<GlobalErrorHandlerMiddleware>();
@@ -31,6 +41,8 @@ bot.Start(async (MessageContext ctx, MyCustomService _) =>
 bot.Help(async ctx => { await ctx.ReplyAsync("This is a help message."); });
 
 bot.Settings(async ctx => { await ctx.ReplyAsync("This is a settings message."); });
+
+bot.Command<ClassCommandHandler>("class");
 
 bot.Command("custom",
     async (MessageContext ctx) =>
@@ -193,7 +205,9 @@ bot.AddScene(childScene);
 
 bot.On(async ctx => { await ctx.ReplyAsync("not handled message"); });
 
-await bot.LaunchAsync();
+Console.WriteLine("Launching bots...");
+
+await botsManager.LaunchAsync();
 
 Console.WriteLine("Bot is running... Press any key to exit.");
 Console.ReadKey();

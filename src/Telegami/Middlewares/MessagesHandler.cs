@@ -1,13 +1,29 @@
-﻿using Telegami.MessageHandlers;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Telegami.Commands;
+using Telegami.MessageHandlers;
 using Telegram.Bot.Types.Enums;
 
-namespace Telegami;
+namespace Telegami.Middlewares;
 
 class MessagesHandler : IMessagesHandler
 {
     private readonly List<IMessageHandler> _handlers = new();
 
     public IReadOnlyList<IMessageHandler> Handlers => _handlers;
+
+    public void Add(IMessageHandler messageHandler)
+    {
+
+    }
+
+    public void Command<TCommandHandler>(string command) where TCommandHandler : ITelegamiCommandHandler
+    {
+        _handlers.Add(new CommandMessageHandler(command, async (MessageContext ctx) =>
+        {
+            var handler = ctx.Scope.ServiceProvider.GetRequiredService<TCommandHandler>();
+            await handler.HandleAsync(ctx);
+        }));
+    }
 
     /// <summary>
     /// Add a handler for the /command.
