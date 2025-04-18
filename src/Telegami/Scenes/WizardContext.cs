@@ -11,6 +11,11 @@ public sealed class WizardContext<TState> : WizardContext, IHaveInvokeAfterEffec
         State = ctx.Session.Get<TState>() ?? new TState();
     }
 
+    public void StateChanged()
+    {
+        Ctx.Session.Set(State);
+    }
+
     public Task InvokeAfterEffectAsync()
     {
         Ctx.Session.Set(State);

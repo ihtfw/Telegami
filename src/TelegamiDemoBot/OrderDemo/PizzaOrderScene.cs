@@ -1,7 +1,9 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Telegami;
 using Telegami.Scenes;
 using Telegami.Sessions;
+using Telegram.Bot.Types.Enums;
 
 namespace TelegamiDemoBot.OrderDemo
 {
@@ -28,6 +30,23 @@ namespace TelegamiDemoBot.OrderDemo
 
             ReEnter(async ctx =>
             {
+                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+                if (state.IsOrderCompleted)
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine("Your basket:");
+                    foreach (var item in state.Basket)
+                    {
+                        var pizzaItem = menu.Get(item.Key);
+                        sb.AppendLine($"{pizzaItem.Name} - {item.Value} pcs");
+                    }
+
+                    await ctx.SendAsync(
+                        $"{state.Name}, we are already preparing your order:\n{sb}\n\nYour order will be delivered to {state.DeliveryAddress}.");
+                    await ctx.LeaveSceneAsync();
+                    return;
+                }
+
                 var msg = """
                           Continue to order!
                           /select - to select a pizza
@@ -80,20 +99,35 @@ namespace TelegamiDemoBot.OrderDemo
                     await ctx.SendAsync("Please select pizza!");
                     return;
                 }
-                
-                await ctx.SendAsync("Your order is cooking now!");
-                await ctx.LeaveSceneAsync();
+
+                await ctx.EnterSceneAsync(DeliveryDetailsSubScene.SceneName);
             });
 
             this.Command("cancel", async ctx =>
             {
                 await ctx.LeaveSceneAsync();
             });
+
+            this.Command("state", async ctx =>
+            {
+                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+                var json = JsonSerializer.Serialize(state, new JsonSerializerOptions()
+                {
+                    WriteIndented = true
+                });
+
+                await ctx.SendAsync($"""
+                                    ```json
+                                    {json}
+                                    ```
+                                    """, ParseMode.MarkdownV2);
+            });
         }
 
         public IEnumerable<IScene> SubScenes()
         {
             yield return new PizzaOrderSelectSubScene();
+            yield return new DeliveryDetailsSubScene();
         }
     }
 }
