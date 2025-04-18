@@ -237,7 +237,7 @@ namespace Telegami
         /// Add middleware to the pipeline.
         /// </summary>
         /// <typeparam name="TMiddleware"></typeparam>
-        public void Use<TMiddleware>() where TMiddleware : ITelegamiMiddleware, new()
+        public void Use<TMiddleware>() where TMiddleware : ITelegamiMiddleware
         {
             _pipelineBuilder.Use<TMiddleware>();
         }
@@ -245,10 +245,19 @@ namespace Telegami
         /// <summary>
         /// Add middleware to the pipeline.
         /// </summary>
-        /// <param name="factory"></param>
-        public void Use(Func<ITelegamiMiddleware> factory)
+        /// <param name="middlewareFactory"></param>
+        public void Use(Func<ITelegamiMiddleware> middlewareFactory)
         {
-            _pipelineBuilder.Use(factory);
+            _pipelineBuilder.Use(middlewareFactory);
+        }
+        
+        /// <summary>
+        /// Add middleware to the pipeline.
+        /// </summary>
+        /// <param name="middleware"></param>
+        public void Use(Func<MessageContext, MessageContextDelegate, Task> middleware)
+        {
+            _pipelineBuilder.Use(middleware);
         }
 
         #endregion

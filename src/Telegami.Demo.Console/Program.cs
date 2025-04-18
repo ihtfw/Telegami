@@ -22,7 +22,8 @@ serviceCollection
     {
         config.Token = token;
     })
-    .AddCommands(typeof(Program));
+    .AddCommands(typeof(Program))
+    .AddMiddlewares(typeof(Program));
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 

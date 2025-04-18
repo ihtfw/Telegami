@@ -19,6 +19,7 @@ serviceCollection
         config.Token = token;
     })
     .AddCommands(typeof(Program))
+    .AddMiddlewares(typeof(Program))
     .AddLiteDBSessions();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -36,6 +37,7 @@ bot.Start(async ctx =>
 });
 
 bot.Command("order_pizza", async ctx => await ctx.EnterSceneAsync(PizzaOrderScene.SceneName));
+
 bot.AddScene(new PizzaOrderScene());
 
 Console.WriteLine("Launching bots...");

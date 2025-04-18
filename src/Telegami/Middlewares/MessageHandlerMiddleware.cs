@@ -16,6 +16,12 @@ namespace Telegami.Middlewares
 
         public async Task InvokeAsync(MessageContext ctx, MessageContextDelegate next)
         {
+            if (ctx.IsHandled)
+            {
+                await next(ctx);
+                return;
+            }
+
             var resolvedMessagesHandler = _messagesHandler;
 
             var sceneName = ctx.Session.CurrentSceneName();
@@ -39,10 +45,11 @@ namespace Telegami.Middlewares
                 }
 
                 await MessageHandlerUtils.InvokeAsync(ctx, messageHandler);
-
-                // we handled message, so no need to process it by other handlers
-                return;
+                ctx.IsHandled = true;
+                break;
             }
+
+            await next(ctx);
         }
 
     }

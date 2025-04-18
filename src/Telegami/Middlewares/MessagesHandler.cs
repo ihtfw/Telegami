@@ -10,17 +10,17 @@ class MessagesHandler : IMessagesHandler
     private readonly List<IMessageHandler> _handlers = new();
 
     public IReadOnlyList<IMessageHandler> Handlers => _handlers;
-
-    public void Add(IMessageHandler messageHandler)
-    {
-
-    }
-
+    
     public void Command<TCommandHandler>(string command) where TCommandHandler : ITelegamiCommandHandler
     {
         _handlers.Add(new CommandMessageHandler(command, async (MessageContext ctx) =>
         {
-            var handler = ctx.Scope.ServiceProvider.GetRequiredService<TCommandHandler>();
+            var handler = ctx.Scope.ServiceProvider.GetService<TCommandHandler>();
+            if (handler == null)
+            {
+                throw new InvalidOperationException($"ITelegamiCommandHandler of type {typeof(TCommandHandler).FullName} not registered in the service provider. Please call AddCommands to register them. Example: serviceCollection.AddTelegamiBot(\"token\").AddCommands(typeof(AssemblyMarkerType))");
+            }
+            
             await handler.HandleAsync(ctx);
         }));
     }

@@ -12,7 +12,13 @@ public sealed class MessageContext
     public TelegamiBot Bot { get; }
 
     public Update Update { get; }
+
     public Message Message { get; }
+
+    public User From => Message.From!;
+
+    public Chat Chat => Message.Chat;
+
     public User BotUser { get; }
 
     public AsyncServiceScope Scope { get; }
@@ -28,12 +34,22 @@ public sealed class MessageContext
         BotUser = botUser;
         Scope = scope;
         Session = session;
-
+        
         if (BotCommand.TryParse(message.Text, out var botCommand))
         {
             BotCommand = botCommand;
         }
     }
+
+    /// <summary>
+    /// Message was processed by some handler
+    /// </summary>
+    public bool IsHandled { get; set; }
+    
+    /// <summary>
+    /// So we can store some properties in the context during the processing of the message.
+    /// </summary>
+    public Dictionary<string, object> State { get; } = new();
 
     public TelegamiSession Session { get; set; }
 
