@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace TelegamiDemoBot.OrderDemo;
+namespace TelegamiDemoBot.OrderPizza;
 
 internal class PizzaMenu
 {

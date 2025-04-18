@@ -4,11 +4,12 @@ namespace Telegami.MessageHandlers;
 
 public class EmptyMessageHandler : IMessageHandler
 {
+    public MessageHandlerOptions Options { get; }
     public static readonly EmptyMessageHandler Instance = new();
 
-    private EmptyMessageHandler()
+    private EmptyMessageHandler(MessageHandlerOptions? options = null)
     {
-
+        Options = options ?? MessageHandlerOptions.Default;
     }
 
     public bool CanHandle(MessageContext ctx)

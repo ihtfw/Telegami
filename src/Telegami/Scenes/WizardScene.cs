@@ -40,7 +40,7 @@ public class WizardScene : Scene
         if (_isDefaultHandlerAdded) return;
 
         _isDefaultHandlerAdded = true;
-        this.On(async (MessageContext ctx, WizardContext wCtx) =>
+        MessagesHandlerEx.On(this, async (MessageContext ctx, WizardContext wCtx) =>
         {
             var messageHandler = _stages.ElementAtOrDefault(wCtx.Index);
             if (messageHandler == null)

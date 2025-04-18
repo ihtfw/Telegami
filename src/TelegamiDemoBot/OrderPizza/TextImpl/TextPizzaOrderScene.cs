@@ -1,17 +1,16 @@
 ﻿using System.Text;
-using System.Text.Json;
 using Telegami;
 using Telegami.Scenes;
 using Telegami.Sessions;
 using Telegram.Bot.Types.Enums;
 
-namespace TelegamiDemoBot.OrderDemo
+namespace TelegamiDemoBot.OrderPizza.TextImpl
 {
-    internal class PizzaOrderScene : Scene, IHaveSubScenes
+    internal class TextPizzaOrderScene : Scene, IHaveSubScenes
     {
-        public const string SceneName = "order_pizza_scene";
+        public const string SceneName = "TextPizzaOrderScene";
 
-        public PizzaOrderScene() : base(SceneName)
+        public TextPizzaOrderScene() : base(SceneName)
         {
             var menu = new PizzaMenu();
 
@@ -66,10 +65,10 @@ namespace TelegamiDemoBot.OrderDemo
                           """;
                 await ctx.SendAsync(msg);
             });
-            
+
             this.Command("select", async ctx =>
             {
-                await ctx.EnterSceneAsync(PizzaOrderSelectSubScene.SceneName);
+                await ctx.EnterSceneAsync(TextPizzaOrderSelectSubScene.SceneName);
             });
 
             this.Command("basket", ctx =>
@@ -79,7 +78,7 @@ namespace TelegamiDemoBot.OrderDemo
                 {
                     return ctx.SendAsync("Your basket is empty.");
                 }
-                
+
                 var sb = new StringBuilder();
                 sb.AppendLine("Your basket:");
                 foreach (var item in state.Basket)
@@ -100,7 +99,7 @@ namespace TelegamiDemoBot.OrderDemo
                     return;
                 }
 
-                await ctx.EnterSceneAsync(DeliveryDetailsSubScene.SceneName);
+                await ctx.EnterSceneAsync(TextDeliveryDetailsSubScene.SceneName);
             });
 
             this.Command("cancel", async ctx =>
@@ -111,14 +110,10 @@ namespace TelegamiDemoBot.OrderDemo
             this.Command("state", async ctx =>
             {
                 var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
-                var json = JsonSerializer.Serialize(state, new JsonSerializerOptions()
-                {
-                    WriteIndented = true
-                });
 
                 await ctx.SendAsync($"""
                                     ```json
-                                    {json}
+                                    {Utils.ToJson(state)}
                                     ```
                                     """, ParseMode.MarkdownV2);
             });
@@ -126,8 +121,8 @@ namespace TelegamiDemoBot.OrderDemo
 
         public IEnumerable<IScene> SubScenes()
         {
-            yield return new PizzaOrderSelectSubScene();
-            yield return new DeliveryDetailsSubScene();
+            yield return new TextPizzaOrderSelectSubScene();
+            yield return new TextDeliveryDetailsSubScene();
         }
     }
 }

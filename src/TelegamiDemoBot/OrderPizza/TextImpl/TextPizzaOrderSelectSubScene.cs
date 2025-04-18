@@ -2,13 +2,13 @@
 using Telegami.Scenes;
 using Telegami.Sessions;
 
-namespace TelegamiDemoBot.OrderDemo;
+namespace TelegamiDemoBot.OrderPizza.TextImpl;
 
-internal class PizzaOrderSelectSubScene : Scene
+internal class TextPizzaOrderSelectSubScene : Scene
 {
-    public const string SceneName = "order_pizza_select_sub_scene";
+    public const string SceneName = "TextPizzaOrderSelectSubScene";
 
-    public PizzaOrderSelectSubScene() : base(SceneName)
+    public TextPizzaOrderSelectSubScene() : base(SceneName)
     {
         var menu = new PizzaMenu();
 

@@ -4,7 +4,7 @@ internal sealed class CommandMessageHandler : BaseMessageHandler
 {
     public string Command { get; }
 
-    public CommandMessageHandler(string command, Delegate handler) : base(handler)
+    public CommandMessageHandler(string command, Delegate handler, MessageHandlerOptions? options = null) : base(handler, options)
     {
         Command = command;
     }

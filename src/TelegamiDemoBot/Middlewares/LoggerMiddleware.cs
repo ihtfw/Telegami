@@ -7,7 +7,14 @@ public class LoggerMiddleware : ITelegamiMiddleware
 {
     public async Task InvokeAsync(MessageContext ctx, MessageContextDelegate next)
     {
-        System.Console.WriteLine($"[{ctx.Message.Chat.Id}] from {ctx.From} {ctx.Message.Text}");
+        if (ctx.Update.CallbackQuery != null)
+        {
+            var jsonCallback = Utils.ToJson(ctx.Update.CallbackQuery);
+            Console.WriteLine(jsonCallback);
+        } 
+
+        var json = Utils.ToJson(ctx.Message);
+        Console.WriteLine(json);
         await next(ctx);
     }
 }

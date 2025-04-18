@@ -4,9 +4,10 @@ namespace Telegami.MessageHandlers;
 
 public class DelegateMessageHandler : IMessageHandler
 {
-    public DelegateMessageHandler(Delegate handler)
+    public DelegateMessageHandler(Delegate handler, MessageHandlerOptions? options = null)
     {
         Handler = handler;
+        Options = options ?? MessageHandlerOptions.Default;
     }
 
     public bool CanHandle(MessageContext ctx)
@@ -20,4 +21,5 @@ public class DelegateMessageHandler : IMessageHandler
     }
 
     public Delegate Handler { get; }
+    public MessageHandlerOptions Options { get; }
 }

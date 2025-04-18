@@ -3,7 +3,8 @@ using Telegami;
 using Telegami.Extensions;
 using Telegami.Sessions.LiteDB;
 using TelegamiDemoBot.Middlewares;
-using TelegamiDemoBot.OrderDemo;
+using TelegamiDemoBot.OrderPizza.BtnImpl;
+using TelegamiDemoBot.OrderPizza.TextImpl;
 
 var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
 if (string.IsNullOrEmpty(token))
@@ -33,14 +34,17 @@ bot.Start(async ctx =>
 {
     var msg = """
               Hello! I'm a Telegami Demo Bot.";
-              /order_pizza - demo to show Scenes
+              /order_pizza_text - demo to show Scenes with text and commands
+              /order_pizza_btn - demo to show Scenes with text and commands and buttons
               """;
     await ctx.SendAsync(msg);
 });
 
-bot.Command("order_pizza", async ctx => await ctx.EnterSceneAsync(PizzaOrderScene.SceneName));
+bot.Command("order_pizza_text", async ctx => await ctx.EnterSceneAsync(TextPizzaOrderScene.SceneName));
+bot.Command("order_pizza_btn", async ctx => await ctx.EnterSceneAsync(BtnPizzaOrderScene.SceneName));
 
-bot.AddScene(new PizzaOrderScene());
+bot.AddScene(new TextPizzaOrderScene());
+bot.AddScene(new BtnPizzaOrderScene());
 
 Console.WriteLine("Launching bots...");
 await botsManager.LaunchAsync();

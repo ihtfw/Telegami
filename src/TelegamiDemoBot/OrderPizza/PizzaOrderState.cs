@@ -1,4 +1,4 @@
-﻿namespace TelegamiDemoBot.OrderDemo;
+﻿namespace TelegamiDemoBot.OrderPizza;
 
 internal class PizzaOrderState
 {

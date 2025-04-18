@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Telegami.Commands;
 using Telegami.MessageHandlers;
 using Telegram.Bot.Types.Enums;
@@ -11,7 +12,7 @@ class MessagesHandler : IMessagesHandler
 
     public IReadOnlyList<IMessageHandler> Handlers => _handlers;
     
-    public void Command<TCommandHandler>(string command) where TCommandHandler : ITelegamiCommandHandler
+    public void Command<TCommandHandler>(string command, MessageHandlerOptions? options = null) where TCommandHandler : ITelegamiCommandHandler
     {
         _handlers.Add(new CommandMessageHandler(command, async (MessageContext ctx) =>
         {
@@ -22,7 +23,7 @@ class MessagesHandler : IMessagesHandler
             }
             
             await handler.HandleAsync(ctx);
-        }));
+        }, options));
     }
 
     /// <summary>
@@ -30,9 +31,10 @@ class MessagesHandler : IMessagesHandler
     /// </summary>
     /// <param name="command"></param>
     /// <param name="handler"></param>
-    public void Command(string command, Delegate handler)
+    /// <param name="options"></param>
+    public void Command(string command, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new CommandMessageHandler(command, handler));
+        _handlers.Add(new CommandMessageHandler(command, handler, options));
     }
 
     /// <summary>
@@ -40,9 +42,10 @@ class MessagesHandler : IMessagesHandler
     /// </summary>
     /// <param name="text"></param>
     /// <param name="handler"></param>
-    public void Hears(string text, Delegate handler)
+    /// <param name="options"></param>
+    public void Hears(string text, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new HearsMessageHandler(text, handler));
+        _handlers.Add(new HearsMessageHandler(text, handler, options));
     }
 
     /// <summary>
@@ -50,8 +53,42 @@ class MessagesHandler : IMessagesHandler
     /// </summary>
     /// <param name="messageType"></param>
     /// <param name="handler"></param>
-    public void On(MessageType messageType, Delegate handler)
+    /// <param name="options"></param>
+    public void On(MessageType messageType, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new TypeMessageHandler(messageType, handler));
+        _handlers.Add(new TypeMessageHandler(messageType, handler, options));
+    }
+
+    /// <summary>
+    /// Handles only CallbackQuery
+    /// </summary>
+    /// <param name="updateType"></param>
+    /// <param name="handler"></param>
+    /// <param name="options"></param>
+    public void On(UpdateType updateType, Delegate handler, MessageHandlerOptions? options = null)
+    {
+        _handlers.Add(new TypeUpdateMessageHandler(updateType, handler, options));
+    }
+
+    /// <summary>
+    /// Handles only CallbackQuery
+    /// </summary>
+    /// <param name="match"></param>
+    /// <param name="handler"></param>
+    /// <param name="options"></param>
+    public void CallbackQuery(string match, Delegate handler, MessageHandlerOptions? options = null)
+    {
+        _handlers.Add(new CallbackQueryMessageHandler(match, handler, options));
+    }
+
+    /// <summary>
+    /// Handles only CallbackQuery
+    /// </summary>
+    /// <param name="match"></param>
+    /// <param name="handler"></param>
+    /// <param name="options"></param>
+    public void CallbackQuery(Regex match, Delegate handler, MessageHandlerOptions? options = null)
+    {
+        _handlers.Add(new CallbackQueryMessageHandler(match, handler, options));
     }
 }

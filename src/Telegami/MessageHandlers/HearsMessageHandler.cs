@@ -4,7 +4,7 @@ internal sealed class HearsMessageHandler : BaseMessageHandler
 {
     public string Text { get; }
 
-    public HearsMessageHandler(string text, Delegate handler) :base(handler)
+    public HearsMessageHandler(string text, Delegate handler, MessageHandlerOptions? options = null) :base(handler, options)
     {
         Text = text;
     }

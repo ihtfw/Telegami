@@ -45,6 +45,16 @@ namespace Telegami.Middlewares
                 }
 
                 await MessageHandlerUtils.InvokeAsync(ctx, messageHandler);
+                if (messageHandler.Options.PreventHandling)
+                {
+                    continue;
+                }
+
+                if (!messageHandler.Options.PreventRemoveMarkup)
+                {
+                    await ctx.RemoveMarkup();
+                }
+
                 ctx.IsHandled = true;
                 break;
             }

@@ -1,4 +1,5 @@
-﻿using Telegami.Commands;
+﻿using System.Text.RegularExpressions;
+using Telegami.Commands;
 using Telegami.MessageHandlers;
 using Telegami.Middlewares;
 using Telegram.Bot.Types.Enums;
@@ -99,24 +100,39 @@ namespace Telegami.Scenes
 
         IReadOnlyList<IMessageHandler> IMessagesHandler.Handlers => _messagesHandler.Handlers;
 
-        public void Command<TCommandHandler>(string command) where TCommandHandler : ITelegamiCommandHandler
+        public void Command<TCommandHandler>(string command, MessageHandlerOptions? options = null) where TCommandHandler : ITelegamiCommandHandler
         {
-            _messagesHandler.Command<TCommandHandler>(command);
+            _messagesHandler.Command<TCommandHandler>(command, options);
         }
 
-        public void Command(string command, Delegate handler)
+        public void Command(string command, Delegate handler, MessageHandlerOptions? options = null)
         {
-            _messagesHandler.Command(command, handler);
+            _messagesHandler.Command(command, handler, options);
         }
 
-        public void Hears(string text, Delegate handler)
+        public void Hears(string text, Delegate handler, MessageHandlerOptions? options = null)
         {
-            _messagesHandler.Hears(text, handler);
+            _messagesHandler.Hears(text, handler, options);
         }
 
-        public void On(MessageType messageType, Delegate handler)
+        public void On(MessageType messageType, Delegate handler, MessageHandlerOptions? options = null)
         {
-            _messagesHandler.On(messageType, handler);
+            _messagesHandler.On(messageType, handler, options);
+        }
+
+        public void On(UpdateType updateType, Delegate handler, MessageHandlerOptions? options = null)
+        {
+            _messagesHandler.On(updateType, handler, options);
+        }
+        
+        public void CallbackQuery(string match, Delegate handler, MessageHandlerOptions? options = null)
+        {
+            _messagesHandler.CallbackQuery(match, handler, options);
+        }
+
+        public void CallbackQuery(Regex match, Delegate handler, MessageHandlerOptions? options = null)
+        {
+            _messagesHandler.CallbackQuery(match, handler, options);
         }
 
         #endregion

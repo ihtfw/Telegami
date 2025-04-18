@@ -1,13 +1,13 @@
 ﻿using Telegami;
 using Telegami.Scenes;
 
-namespace TelegamiDemoBot.OrderDemo;
+namespace TelegamiDemoBot.OrderPizza.TextImpl;
 
-internal class DeliveryDetailsSubScene : WizardScene
+internal class TextDeliveryDetailsSubScene : WizardScene
 {
-    public const string SceneName = "DeliveryDetailsSubScene";
+    public const string SceneName = "TextDeliveryDetailsSubScene";
 
-    public DeliveryDetailsSubScene() : base(SceneName)
+    public TextDeliveryDetailsSubScene() : base(SceneName)
     {
         Add(AskNameStage);
         Add(SetNameStage);

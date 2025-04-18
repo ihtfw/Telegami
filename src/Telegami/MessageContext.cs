@@ -142,4 +142,23 @@ public sealed class MessageContext
 
         return message;
     }
+
+    public async Task RemoveMarkup()
+    {
+        if (Update.Type != UpdateType.CallbackQuery)
+        {
+            return;
+        }
+
+        try
+        {
+            await Bot.Client.EditMessageReplyMarkup(Chat.Id, Message.Id, null, Message.BusinessConnectionId);
+        }
+        catch// (Exception e)
+        {
+            // ignore
+            // we can ignore this one to avoid any problems
+            // TODO add logging
+        }
+    }
 }
