@@ -82,7 +82,7 @@ public class TelegamiBotBuilder
     public TelegamiBotBuilder AddMiddlewares(params Type[] assemblyMarkers)
     {
         var assemblies = assemblyMarkers.Select(x => x.Assembly).Distinct().ToArray();
-        return AddCommands(assemblies);
+        return AddMiddlewares(assemblies);
     }
 
     /// <summary>
@@ -97,15 +97,15 @@ public class TelegamiBotBuilder
             .Select(x => x.ServiceType)
             .ToHashSet();
 
-        var commandTypes = assemblies
+        var middlewareTypes = assemblies
             .SelectMany(x => x.GetTypes())
             .Where(x => x.IsClass && !x.IsAbstract && typeof(ITelegamiMiddleware).IsAssignableFrom(x));
 
-        foreach (var commandType in commandTypes)
+        foreach (var middlewareType in middlewareTypes)
         {
-            if (middlewares.Add(commandType))
+            if (middlewares.Add(middlewareType))
             {
-                ServiceCollection.AddScoped(commandType);
+                ServiceCollection.AddScoped(middlewareType);
             }
         }
 

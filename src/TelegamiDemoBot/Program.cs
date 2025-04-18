@@ -2,6 +2,7 @@
 using Telegami;
 using Telegami.Extensions;
 using Telegami.Sessions.LiteDB;
+using TelegamiDemoBot.Middlewares;
 using TelegamiDemoBot.OrderDemo;
 
 var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
@@ -26,6 +27,7 @@ var serviceProvider = serviceCollection.BuildServiceProvider();
 
 var botsManager = serviceProvider.GetRequiredService<TelegamiBotsManager>();
 var bot = botsManager.Get();
+bot.Use<LoggerMiddleware>();
 
 bot.Start(async ctx =>
 {
