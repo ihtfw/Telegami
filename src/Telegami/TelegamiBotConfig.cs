@@ -8,4 +8,9 @@ public class TelegamiBotConfig
     /// By default, we don't process other bots messages.
     /// </summary>
     public bool IgnoreBotMessages { get; set; } = true;
+
+    /// <summary>
+    /// By default, we don't process edit updates.
+    /// </summary>
+    public bool IgnoreEditUpdates { get; set; } = true;
 }

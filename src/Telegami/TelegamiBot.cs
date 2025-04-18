@@ -101,6 +101,17 @@ namespace Telegami
 
         private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
         {
+            if (_config.IgnoreEditUpdates)
+            {
+                switch (update.Type)
+                {
+                    case UpdateType.EditedMessage:
+                    case UpdateType.EditedChannelPost:
+                    case UpdateType.EditedBusinessMessage:
+                        return;
+                }
+            }
+
             var message = update.ResolveMessage();
             if (message == null || message.From == null)
             {
