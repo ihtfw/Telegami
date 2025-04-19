@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Telegami;
 using Telegami.Extensions;
+using Telegami.Scenes;
 using Telegami.Sessions.LiteDB;
 using TelegamiDemoBot.Middlewares;
 using TelegamiDemoBot.OrderPizza;
 using TelegamiDemoBot.OrderPizza.BtnImpl;
 using TelegamiDemoBot.OrderPizza.TextImpl;
+using Telegram.Bot.Types.Enums;
 
 var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
 if (string.IsNullOrEmpty(token))
@@ -40,6 +42,7 @@ var commands = """
                /date - show current date
                /order_pizza_text - demo to show Scenes with text and commands
                /order_pizza_btn - demo to show Scenes with text and commands and buttons
+               /instance_scene - example how to create scene with separate class
                """;
 
 bot.Start(async ctx =>
@@ -47,6 +50,7 @@ bot.Start(async ctx =>
     var msg = $"Hello! I'm a Telegami Demo Bot.\n{commands}";
     await ctx.SendAsync(msg);
 });
+
 bot.Help(async ctx =>
 {
     var msg = $"Here what I can:\n{commands}";
@@ -56,9 +60,17 @@ bot.Help(async ctx =>
 bot.Command("order_pizza_text", async ctx => await ctx.EnterSceneAsync(TextPizzaOrderScene.SceneName));
 bot.Command("order_pizza_btn", async ctx => await ctx.EnterSceneAsync(BtnPizzaOrderScene.SceneName));
 bot.Command("date", async ctx => await ctx.SendAsync(DateTime.Now.ToString("O")));
+bot.Command("instance_scene", async ctx => await ctx.EnterSceneAsync("instance_scene"));
 
 bot.AddScene<TextPizzaOrderScene>(TextPizzaOrderScene.SceneName);
 bot.AddScene<BtnPizzaOrderScene>(BtnPizzaOrderScene.SceneName);
+
+var instanceScene = new Scene("instance_scene");
+instanceScene.Enter(async ctx => { await ctx.SendAsync("Send me a sticker! (or /back)"); });
+instanceScene.Command("back", async ctx => { await ctx.LeaveSceneAsync(); });
+instanceScene.On(MessageType.Sticker, async ctx => { await ctx.ReplyAsync("wow! nice stiker!"); });
+instanceScene.On(async ctx => { await ctx.SendAsync("Send me a sticker! (or /back)"); });
+bot.AddScene(instanceScene);
 
 bot.On(async ctx =>
 {
