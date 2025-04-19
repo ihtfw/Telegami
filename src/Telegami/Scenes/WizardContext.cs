@@ -18,7 +18,11 @@ public sealed class WizardContext<TState> : WizardContext, IHaveInvokeAfterEffec
 
     public Task InvokeAfterEffectAsync()
     {
-        Ctx.Session.Set(State);
+        if (Ctx.Session.Scenes.Any())
+        {
+            Ctx.Session.Set(State);
+        }
+
         return Task.CompletedTask;
     }
 }

@@ -146,6 +146,19 @@ namespace Telegami
                 await using var scope = ServiceProvider.CreateAsyncScope();
                 var messageContext = new MessageContext(this, update, message, BotUser!, scope, session);
 
+                if (_config.EnableGlobalDebugDumpCommand 
+                    && messageContext.IsCommand 
+                    && messageContext.BotCommand!.Command == "telegami_debug_dump")
+                {
+                    await messageContext.SendAsync($"""
+                                              Session dump:
+                                              ```json
+                                              {Utils.ToJsonDebug(session)}
+                                              ```
+                                              """, parseMode: ParseMode.MarkdownV2, cancellationToken: cancellationToken);
+                    return;
+                }
+
                 try
                 {
                     await _pipeline(messageContext);
@@ -188,7 +201,7 @@ namespace Telegami
             }
 
             // let's exit current scene
-            if (_scenesManager.TryGet(currentScene, out var scene))
+            if (_scenesManager.TryGet(currentScene, ctx.Scope.ServiceProvider, out var scene))
             {
                 await MessageHandlerUtils.InvokeAsync(ctx, scene!.LeaveHandler);
             }
@@ -208,7 +221,7 @@ namespace Telegami
                     return;
                 }
                 
-                if (_scenesManager.TryGet(parentSceneName, out var parentScene))
+                if (_scenesManager.TryGet(parentSceneName, ctx.Scope.ServiceProvider, out var parentScene))
                 {
                     await MessageHandlerUtils.InvokeAsync(ctx, parentScene!.ReEnterHandler);
                 }
@@ -217,7 +230,7 @@ namespace Telegami
 
         internal async Task EnterSceneAsync(MessageContext ctx, string sceneName)
         {
-            if (!_scenesManager.TryGet(sceneName, out var scene))
+            if (!_scenesManager.TryGet(sceneName, ctx.Scope.ServiceProvider, out var scene))
             {
                 await ctx.ReplyAsync($"Attempt to enter scene: '{sceneName}', but it's not found!");
                 return;
@@ -232,18 +245,19 @@ namespace Telegami
             await MessageHandlerUtils.InvokeAsync(ctx, scene!.EnterHandler);
         }
 
-        public void AddScene(IScene scene)
+        public void AddScene(IScene sceneInstance)
         {
-            _scenesManager.Add(scene);
+            _scenesManager.Add(sceneInstance);
+        }
 
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (scene is IHaveSubScenes haveSubScenes)
-            {
-                foreach (var subScene in haveSubScenes.SubScenes())
-                {
-                    AddScene(subScene);
-                }
-            }
+        public void AddScene(string sceneName, Type sceneType)
+        {
+            _scenesManager.Add(sceneName, sceneType);
+        }
+
+        public void AddScene<TScene>(string sceneName) where TScene : IScene
+        {
+            _scenesManager.Add(sceneName, typeof(TScene));
         }
 
         #endregion

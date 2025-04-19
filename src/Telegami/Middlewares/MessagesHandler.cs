@@ -8,13 +8,29 @@ namespace Telegami.Middlewares;
 
 class MessagesHandler : IMessagesHandler
 {
-    private readonly List<IMessageHandler> _handlers = new();
+    private readonly Dictionary<int, List<IMessageHandler>> _priorityHandlers = new();
 
-    public IReadOnlyList<IMessageHandler> Handlers => _handlers;
-    
+    public IReadOnlyList<IMessageHandler> Handlers { get; private set; } = Array.Empty<IMessageHandler>();
+
+    private void Add(IMessageHandler messageHandler)
+    {
+        if (!_priorityHandlers.TryGetValue(messageHandler.Options.Priority, out var items))
+        {
+            items = new List<IMessageHandler>();
+            _priorityHandlers.Add(messageHandler.Options.Priority, items);
+        }
+
+        items.Add(messageHandler);
+
+        Handlers = _priorityHandlers
+            .OrderBy(x => x.Key)
+            .SelectMany(x => x.Value)
+            .ToList();
+    }
+
     public void Command<TCommandHandler>(string command, MessageHandlerOptions? options = null) where TCommandHandler : ITelegamiCommandHandler
     {
-        _handlers.Add(new CommandMessageHandler(command, async (MessageContext ctx) =>
+        Add(new CommandMessageHandler(command, async (MessageContext ctx) =>
         {
             var handler = ctx.Scope.ServiceProvider.GetService<TCommandHandler>();
             if (handler == null)
@@ -34,7 +50,7 @@ class MessagesHandler : IMessagesHandler
     /// <param name="options"></param>
     public void Command(string command, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new CommandMessageHandler(command, handler, options));
+        Add(new CommandMessageHandler(command, handler, options));
     }
 
     /// <summary>
@@ -45,7 +61,7 @@ class MessagesHandler : IMessagesHandler
     /// <param name="options"></param>
     public void Hears(string text, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new HearsMessageHandler(text, handler, options));
+        Add(new HearsMessageHandler(text, handler, options));
     }
 
     /// <summary>
@@ -56,7 +72,7 @@ class MessagesHandler : IMessagesHandler
     /// <param name="options"></param>
     public void On(MessageType messageType, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new TypeMessageHandler(messageType, handler, options));
+        Add(new TypeMessageHandler(messageType, handler, options));
     }
 
     /// <summary>
@@ -67,7 +83,7 @@ class MessagesHandler : IMessagesHandler
     /// <param name="options"></param>
     public void On(UpdateType updateType, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new TypeUpdateMessageHandler(updateType, handler, options));
+        Add(new TypeUpdateMessageHandler(updateType, handler, options));
     }
 
     /// <summary>
@@ -78,7 +94,7 @@ class MessagesHandler : IMessagesHandler
     /// <param name="options"></param>
     public void CallbackQuery(string match, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new CallbackQueryMessageHandler(match, handler, options));
+        Add(new CallbackQueryMessageHandler(match, handler, options));
     }
 
     /// <summary>
@@ -89,6 +105,6 @@ class MessagesHandler : IMessagesHandler
     /// <param name="options"></param>
     public void CallbackQuery(Regex match, Delegate handler, MessageHandlerOptions? options = null)
     {
-        _handlers.Add(new CallbackQueryMessageHandler(match, handler, options));
+        Add(new CallbackQueryMessageHandler(match, handler, options));
     }
 }

@@ -8,15 +8,13 @@ internal class TextPizzaOrderSelectSubScene : Scene
 {
     public const string SceneName = "TextPizzaOrderSelectSubScene";
 
-    public TextPizzaOrderSelectSubScene() : base(SceneName)
+    public TextPizzaOrderSelectSubScene(PizzaMenu menu) : base(SceneName)
     {
-        var menu = new PizzaMenu();
-
-        Enter(async ctx =>
+        Enter(async (MessageContext ctx, PizzaMenu m) =>
         {
             var msg = $"""
                        Please select a pizza from the menu:
-                       {menu.ItemsAsCommands()}
+                       {m.ItemsAsCommands()}
                        /back - to go back to the main menu
                        """;
             await ctx.SendAsync(msg);

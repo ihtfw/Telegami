@@ -13,4 +13,9 @@ public class TelegamiBotConfig
     /// By default, we don't process edit updates.
     /// </summary>
     public bool IgnoreEditUpdates { get; set; } = true;
+
+    /// <summary>
+    /// /telegami_debug_dump
+    /// </summary>
+    public bool EnableGlobalDebugDumpCommand { get; set; }
 }

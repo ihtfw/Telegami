@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Telegami.Commands;
 using Telegami.Middlewares;
+using Telegami.Scenes;
 
 namespace Telegami.Extensions;
 
@@ -15,7 +16,56 @@ public class TelegamiBotBuilder
         Key = key;
         ServiceCollection = serviceCollection;
     }
-    
+
+    /// <summary>
+    /// Registers IScene
+    /// </summary>
+    /// <returns></returns>
+    public TelegamiBotBuilder AddScene<TScene>() where TScene : class, IScene
+    {
+        ServiceCollection.AddScoped<TScene>();
+        return this;
+    }
+
+    /// <summary>
+    /// Registers all IScene from assemblies
+    /// </summary>
+    /// <param name="assemblyMarkers"></param>
+    /// <returns></returns>
+    public TelegamiBotBuilder AddScenes(params Type[] assemblyMarkers)
+    {
+        var assemblies = assemblyMarkers.Select(x => x.Assembly).Distinct().ToArray();
+        return AddScenes(assemblies);
+    }
+
+    /// <summary>
+    /// Registers all IScene from assemblies
+    /// </summary>
+    /// <param name="assemblies"></param>
+    /// <returns></returns>
+    public TelegamiBotBuilder AddScenes(params Assembly[] assemblies)
+    {
+        var registeredTypes = ServiceCollection
+            .Where(x => typeof(IScene).IsAssignableFrom(x.ServiceType))
+            .Select(x => x.ServiceType)
+            .ToHashSet();
+
+        var foundTypes = assemblies
+            .SelectMany(x => x.GetTypes())
+            .Where(x => x.IsClass && !x.IsAbstract && typeof(IScene).IsAssignableFrom(x));
+
+        foreach (var type in foundTypes)
+        {
+            if (registeredTypes.Add(type))
+            {
+                ServiceCollection.AddScoped(type);
+            }
+        }
+
+        return this;
+    }
+
+
     /// <summary>
     /// Registers ITelegamiCommandHandler
     /// </summary>

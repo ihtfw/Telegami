@@ -5,8 +5,6 @@ namespace Telegami.Scenes;
 
 public class WizardScene : Scene
 {
-    private bool _isDefaultHandlerAdded;
-
     private readonly List<IMessageHandler> _stages = new();
 
     public WizardScene(string name, params Delegate[] stages) : base(name)
@@ -16,13 +14,8 @@ public class WizardScene : Scene
             Add(stage);
         }
 
-        this.Enter(async (MessageContext ctx, WizardContext wCtx) =>
+        this.On(async (MessageContext ctx, WizardContext wCtx) =>
         {
-            // we add it here, so developer can add commands and other handlers before we handle the message
-            AddDefaultHandler();
-
-            wCtx.Set(0);
-
             var messageHandler = _stages.ElementAtOrDefault(wCtx.Index);
             if (messageHandler == null)
             {
@@ -31,17 +24,12 @@ public class WizardScene : Scene
             }
 
             await MessageHandlerUtils.InvokeAsync(ctx, messageHandler);
-        });
+        }, MessageHandlerOptions.LowPriority);
 
-    }
-
-    private void AddDefaultHandler()
-    {
-        if (_isDefaultHandlerAdded) return;
-
-        _isDefaultHandlerAdded = true;
-        MessagesHandlerEx.On(this, async (MessageContext ctx, WizardContext wCtx) =>
+        Enter(async (MessageContext ctx, WizardContext wCtx) =>
         {
+            wCtx.Set(0);
+
             var messageHandler = _stages.ElementAtOrDefault(wCtx.Index);
             if (messageHandler == null)
             {

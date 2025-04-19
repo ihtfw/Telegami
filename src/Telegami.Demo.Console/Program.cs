@@ -74,6 +74,7 @@ echoScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
 echoScene.Command("leave", async ctx => await ctx.LeaveSceneAsync());
 echoScene.On(MessageType.Text, async ctx => await ctx.ReplyAsync(ctx.Message.Text ?? ""));
 echoScene.On(async ctx => await ctx.ReplyAsync("Only text messages please"));
+
 bot.AddScene(echoScene);
 
 #endregion

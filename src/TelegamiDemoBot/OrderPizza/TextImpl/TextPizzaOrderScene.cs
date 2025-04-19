@@ -6,14 +6,14 @@ using Telegram.Bot.Types.Enums;
 
 namespace TelegamiDemoBot.OrderPizza.TextImpl
 {
-    internal class TextPizzaOrderScene : Scene, IHaveSubScenes
+    [SubScene(TextPizzaOrderSelectSubScene.SceneName, typeof(TextPizzaOrderSelectSubScene))]
+    [SubScene(TextDeliveryDetailsSubScene.SceneName, typeof(TextDeliveryDetailsSubScene))]
+    internal class TextPizzaOrderScene : Scene
     {
         public const string SceneName = "TextPizzaOrderScene";
 
         public TextPizzaOrderScene() : base(SceneName)
         {
-            var menu = new PizzaMenu();
-
             Enter(async ctx =>
             {
                 var msg = """
@@ -27,7 +27,7 @@ namespace TelegamiDemoBot.OrderPizza.TextImpl
                 await ctx.SendAsync(msg);
             });
 
-            ReEnter(async ctx =>
+            ReEnter(async (MessageContext ctx, PizzaMenu menu) =>
             {
                 var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
                 if (state.IsOrderCompleted)
@@ -53,7 +53,7 @@ namespace TelegamiDemoBot.OrderPizza.TextImpl
                           /confirm - to confirm the order
                           /cancel - to cancel the order
                           """;
-
+                
                 await ctx.SendAsync(msg);
             });
 
@@ -71,7 +71,7 @@ namespace TelegamiDemoBot.OrderPizza.TextImpl
                 await ctx.EnterSceneAsync(TextPizzaOrderSelectSubScene.SceneName);
             });
 
-            this.Command("basket", ctx =>
+            this.Command("basket", (MessageContext ctx, PizzaMenu menu) =>
             {
                 var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
                 if (state.Basket.Count == 0)
@@ -117,12 +117,6 @@ namespace TelegamiDemoBot.OrderPizza.TextImpl
                                     ```
                                     """, ParseMode.MarkdownV2);
             });
-        }
-
-        public IEnumerable<IScene> SubScenes()
-        {
-            yield return new TextPizzaOrderSelectSubScene();
-            yield return new TextDeliveryDetailsSubScene();
         }
     }
 }

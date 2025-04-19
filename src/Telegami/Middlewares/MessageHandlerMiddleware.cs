@@ -27,7 +27,7 @@ namespace Telegami.Middlewares
             var sceneName = ctx.Session.CurrentSceneName();
             while (sceneName != null)
             {
-                if (_scenesManager.TryGet(sceneName, out var scene))
+                if (_scenesManager.TryGet(sceneName, ctx.Scope.ServiceProvider, out var scene))
                 {
                     resolvedMessagesHandler = scene!;
                     break;

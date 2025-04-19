@@ -2,8 +2,11 @@
 
 namespace Telegami.MessageHandlers;
 
-public record MessageHandlerOptions(bool PreventHandling = false, bool PreventRemoveMarkup = false)
+public record MessageHandlerOptions(bool PreventHandling = false, bool PreventRemoveMarkup = false, int Priority = 100)
 {
+    public static readonly MessageHandlerOptions HighPriority = new(Priority: 10);
+    public static readonly MessageHandlerOptions LowPriority = new(Priority: 1000);
+
     public static readonly MessageHandlerOptions Default = new();
     public static readonly MessageHandlerOptions PreventHandlingOptions = new(PreventHandling: true);
     public static readonly MessageHandlerOptions PreventRemoveMarkupOptions = new(PreventRemoveMarkup: true);
