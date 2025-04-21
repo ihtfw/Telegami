@@ -43,10 +43,10 @@ internal class BtnPizzaOrderSelectSubScene : Scene
         var btns = new TelegamiButtons();
         foreach (var pizzaItem in menu.Items)
         {
-            btns.AddButtonRow(pizzaItem.Name, "pizza_" + pizzaItem.Key);
+            btns.Add(pizzaItem.Name, "pizza_" + pizzaItem.Key);
         }
-        btns.AddButtonRow("Back", "back");
+        btns.Add("Back", "back");
 
-        await ctx.SendAsync(msg, replyMarkup: btns.ToInlineButtonArray());
+        await ctx.SendAsync(msg, replyMarkup: btns.ToInlineButtons());
     }
 }

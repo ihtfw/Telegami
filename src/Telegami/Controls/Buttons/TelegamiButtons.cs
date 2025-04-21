@@ -1,22 +1,18 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using System.Collections;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegami.Controls.Buttons
 {
-    public class TelegamiButtons
+    public class TelegamiButtons : IEnumerable<TelegamiButtonRow>
     {
         public string Id { get; }
 
-        private readonly List<TelegamiButtonRow> _buttons = new();
+        private readonly List<TelegamiButtonRow> _rows = new();
 
         public TelegamiButtons(string id = "")
         {
             Id = id;
         }
-
-        // public TelegamiButtons(ControlBase control)
-        // {
-        //     DependencyControl = control;
-        // }
 
         public TelegamiButtons(IEnumerable<TelegamiButtonRow> rows) : this("", rows)
         {
@@ -26,91 +22,116 @@ namespace Telegami.Controls.Buttons
         public TelegamiButtons(string id, IEnumerable<TelegamiButtonRow> rows)
         {
             Id = id;
-            _buttons = rows.ToList();
+            _rows = rows.ToList();
         }
-
-
-        // public IReplyMarkup Markup { get; set; }
-
-        // public ControlBase DependencyControl { get; set; }
 
         /// <summary>
         ///     Contains the number of rows.
         /// </summary>
-        public int Rows => _buttons.Count;
+        public int Rows => _rows.Count;
 
         /// <summary>
-        ///     Contains the highest number of columns in an row.
+        ///     Contains the highest number of columns in a row.
         /// </summary>
         public int Cols
         {
-            get { return _buttons.Select(a => a.Count).OrderByDescending(a => a).FirstOrDefault(); }
+            get { return _rows.Select(a => a.Count).OrderByDescending(a => a).FirstOrDefault(); }
         }
-
-
-        public TelegamiButtonRow this[int row] => _buttons[row];
+        
+        public TelegamiButtonRow this[int row] => _rows[row];
 
         public int Count
         {
             get
             {
-                if (_buttons.Count == 0)
+                if (_rows.Count == 0)
                 {
                     return 0;
                 }
 
-                return _buttons.Select(a => a.ToArray()).ToList().Aggregate((a, b) => a.Union(b).ToArray()).Length;
+                return _rows.Sum(x => x.Count);
             }
         }
 
-        public TelegamiButtons AddButtonRow(string text, string value, string? url = null)
+        public TelegamiButtons Add(params (string text, string value)[] rowButtons)
         {
-            _buttons.Add(new List<TelegamiButton> { new(text, value, url) });
+            if (rowButtons.Length == 0)
+            {
+                return this;
+            }
+
+            var row = new TelegamiButtonRow();
+            foreach (var (text, value) in rowButtons)
+            {
+                row.Add(new TelegamiButton(text, value));
+            }
+            _rows.Add(row);
+            return this;
+        }
+
+        public TelegamiButtons Add(params (string text, string value, string? url)[] rowButtons)
+        {
+            if (rowButtons.Length == 0)
+            {
+                return this;
+            }
+
+            var row = new TelegamiButtonRow();
+            foreach (var (text, value, url) in rowButtons)
+            {
+                row.Add(new TelegamiButton(text, value, url));
+            }
+            _rows.Add(row);
+            return this;
+        }
+
+        public TelegamiButtons Add(string text, string value, string? url = null)
+        {
+            return Add(new TelegamiButtonRow(new TelegamiButton(text, value, url)));
+        }
+        public TelegamiButtons Add(TelegamiButton button)
+        {
+            _rows.Add(new TelegamiButtonRow(button));
 
             return this;
         }
 
-        //public void AddButtonRow(ButtonRow row)
-        //{
-        //    Buttons.Add(row.ToList());
-        //}
-
-        public TelegamiButtons AddButtonRow(TelegamiButtonRow row)
+        public TelegamiButtons Add(TelegamiButtonRow row)
         {
-            _buttons.Add(row);
+            _rows.Add(row);
 
             return this;
         }
 
-        public TelegamiButtons AddButtonRow(params TelegamiButton[] row)
+        public TelegamiButtons AddRange(IEnumerable<TelegamiButtonRow> rows)
         {
-            AddButtonRow(row.ToList());
+            _rows.AddRange(rows);
 
             return this;
         }
 
-        public TelegamiButtons AddButtonRows(IEnumerable<TelegamiButtonRow> rows)
+        public void Insert(int index, TelegamiButtonRow row)
         {
-            _buttons.AddRange(rows);
-
-            return this;
+            _rows.Insert(index, row);
         }
 
-        public void InsertButtonRow(int index, IEnumerable<TelegamiButton> row)
+        public InlineKeyboardButton[][] ToInlineButtons()
         {
-            _buttons.Insert(index, row.ToList());
+            var array = _rows
+                .Select(a => a.Select(b => b.ToInlineButton(this)).ToArray())
+                .ToArray();
+
+            return array;
         }
 
-        public void InsertButtonRow(int index, TelegamiButtonRow row)
+        public IEnumerator<TelegamiButtonRow> GetEnumerator()
         {
-            _buttons.Insert(index, row);
+            return _rows.GetEnumerator();
         }
 
-        public InlineKeyboardButton[][] ToInlineButtonArray()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            var ikb = _buttons.Select(a => a.ToArray().Select(b => b.ToInlineButton(this)).ToArray()).ToArray();
-
-            return ikb;
+            return GetEnumerator();
         }
     }
 }

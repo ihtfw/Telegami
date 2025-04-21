@@ -2,7 +2,6 @@
 using Telegami;
 using Telegami.Extensions;
 using Telegami.Scenes;
-using Telegami.Sessions.LiteDB;
 using TelegamiDemoBot.Middlewares;
 using TelegamiDemoBot.OrderPizza;
 using TelegamiDemoBot.OrderPizza.BtnImpl;

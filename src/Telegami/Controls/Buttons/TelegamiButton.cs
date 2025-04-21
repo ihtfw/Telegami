@@ -11,11 +11,11 @@ public class TelegamiButton
         Url = url;
     }
 
-    public string Text { get; set; }
+    public string Text { get; }
 
-    public string Value { get; set; }
+    public string Value { get; }
 
-    public string? Url { get; set; }
+    public string? Url { get; }
 
 
     /// <summary>
@@ -23,7 +23,7 @@ public class TelegamiButton
     /// </summary>
     /// <param name="buttons"></param>
     /// <returns></returns>
-    public virtual InlineKeyboardButton ToInlineButton(TelegamiButtons buttons)
+    public InlineKeyboardButton ToInlineButton(TelegamiButtons buttons)
     {
         var id = string.IsNullOrEmpty(buttons.Id) ? "" : buttons.Id + "_";
         if (Url == null)
@@ -44,9 +44,9 @@ public class TelegamiButton
     /// <summary>
     ///     Returns a KeyBoardButton
     /// </summary>
-    /// <param name="form"></param>
+    /// <param name="buttons"></param>
     /// <returns></returns>
-    public virtual KeyboardButton ToKeyboardButton(TelegamiButton form)
+    public KeyboardButton ToKeyboardButton(TelegamiButtons buttons)
     {
         return new KeyboardButton(Text);
     }

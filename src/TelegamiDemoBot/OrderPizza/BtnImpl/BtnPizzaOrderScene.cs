@@ -18,15 +18,15 @@ namespace TelegamiDemoBot.OrderPizza.BtnImpl
         {
             Enter(async ctx =>
             {
-                var btns = new TelegamiButtons()
-                    .AddButtonRow("Select pizza", "select")
-                    .AddButtonRow("View basket", "basket")
-                    .AddButtonRow("Confirm order", "confirm")
-                    .AddButtonRow("Cancel order", "cancel")
-                    ;
+                var btns = new TelegamiButtons
+                {
+                    ("Select pizza", "select"),
+                    ("View basket", "basket"),
+                    { ("Confirm order", "confirm"), ("Cancel order", "cancel") }
+                };
 
-                var replyMarkup = btns.ToInlineButtonArray();
-                await ctx.SendAsync("Let's order pizza!", replyMarkup:replyMarkup);
+                var replyMarkup = btns.ToInlineButtons();
+                await ctx.SendAsync("Let's order pizza!", replyMarkup: replyMarkup);
             });
 
             ReEnter(async (MessageContext ctx, PizzaMenu menu) =>
@@ -53,10 +53,8 @@ namespace TelegamiDemoBot.OrderPizza.BtnImpl
 
             this.Command("cancel", async ctx => await ctx.LeaveSceneAsync());
 
-            this.CallbackQuery("select", async ctx =>
-            {
-                await ctx.EnterSceneAsync(BtnPizzaOrderSelectSubScene.SceneName);
-            });
+            this.CallbackQuery("select",
+                async ctx => { await ctx.EnterSceneAsync(BtnPizzaOrderSelectSubScene.SceneName); });
 
             this.CallbackQuery("basket", async (MessageContext ctx, PizzaMenu menu) =>
             {
@@ -75,6 +73,7 @@ namespace TelegamiDemoBot.OrderPizza.BtnImpl
                     var pizzaItem = menu.Get(item.Key);
                     sb.AppendLine($"{pizzaItem.Name} - {item.Value} pcs");
                 }
+
                 sb.AppendLine($"Total: ${state.Basket.Sum(i => menu.Get(i.Key).Price * i.Value)}");
                 await ctx.SendAsync(sb.ToString());
 
@@ -83,7 +82,7 @@ namespace TelegamiDemoBot.OrderPizza.BtnImpl
 
             this.CallbackQuery("confirm", async ctx =>
             {
-                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState(); 
+                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
                 if (state.Basket.Count == 0)
                 {
                     await ctx.SendAsync("Please select pizza!");
@@ -94,10 +93,7 @@ namespace TelegamiDemoBot.OrderPizza.BtnImpl
                 await ctx.EnterSceneAsync(TextDeliveryDetailsSubScene.SceneName);
             });
 
-            this.CallbackQuery("cancel", async ctx =>
-            {
-                await ctx.LeaveSceneAsync();
-            });
+            this.CallbackQuery("cancel", async ctx => { await ctx.LeaveSceneAsync(); });
 
             Leave(async ctx =>
             {
@@ -107,28 +103,29 @@ namespace TelegamiDemoBot.OrderPizza.BtnImpl
                           """;
                 await ctx.SendAsync(msg);
             });
-            
+
             this.Command("state", async ctx =>
             {
-                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState(); 
+                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
 
                 await ctx.SendAsync($"""
-                                    ```json
-                                    {Utils.ToJson(state)}
-                                    ```
-                                    """, ParseMode.MarkdownV2);
+                                     ```json
+                                     {Utils.ToJson(state)}
+                                     ```
+                                     """, ParseMode.MarkdownV2);
             });
         }
 
         private static async Task SendContinueToOrder(MessageContext ctx)
         {
-            var btns = new TelegamiButtons()
-                .AddButtonRow("Select pizza", "select")
-                .AddButtonRow("View basket", "basket")
-                .AddButtonRow("Confirm order", "confirm")
-                .AddButtonRow("Cancel order", "cancel");
+            var btns = new TelegamiButtons
+            {
+                ("Select pizza", "select"),
+                ("View basket", "basket"),
+                { ("Confirm order", "confirm"), ("Cancel order", "cancel") }
+            };
 
-            var replyMarkup = btns.ToInlineButtonArray();
+            var replyMarkup = btns.ToInlineButtons();
             await ctx.SendAsync("Continue to order.", replyMarkup: replyMarkup);
         }
     }

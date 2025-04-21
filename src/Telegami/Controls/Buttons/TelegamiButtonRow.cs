@@ -1,23 +1,33 @@
-﻿namespace Telegami.Controls.Buttons;
+﻿using System.Collections;
 
-public class TelegamiButtonRow
+namespace Telegami.Controls.Buttons;
+
+public class TelegamiButtonRow : IEnumerable<TelegamiButton>
 {
-
     private List<TelegamiButton> _buttons = new();
 
     public TelegamiButtonRow()
     {
     }
 
-    public TelegamiButtonRow(params TelegamiButton[] buttons)
+    public TelegamiButtonRow(IEnumerable<TelegamiButton> buttons)
     {
         _buttons = buttons.ToList();
     }
 
-
+    public TelegamiButtonRow(params TelegamiButton[] buttons)
+    {
+        _buttons = buttons.ToList();
+    }
+    
     public TelegamiButton this[int index] => _buttons[index];
 
     public int Count => _buttons.Count;
+
+    public void Add(string text, string value, string? url = null)
+    {
+        Add(new TelegamiButton(text, value, url));
+    }
 
     public void Add(TelegamiButton button)
     {
@@ -32,21 +42,6 @@ public class TelegamiButtonRow
     public void Insert(int index, TelegamiButton button)
     {
         _buttons.Insert(index, button);
-    }
-
-    public IEnumerator<TelegamiButton> GetEnumerator()
-    {
-        return _buttons.GetEnumerator();
-    }
-
-    public TelegamiButton[] ToArray()
-    {
-        return _buttons.ToArray();
-    }
-
-    public List<TelegamiButton> ToList()
-    {
-        return _buttons.ToList();
     }
 
     public bool Matches(string text, bool useText = true)
@@ -94,5 +89,15 @@ public class TelegamiButtonRow
     public static implicit operator TelegamiButtonRow(List<TelegamiButton> buttons)
     {
         return new TelegamiButtonRow { _buttons = buttons };
+    }
+
+    public IEnumerator<TelegamiButton> GetEnumerator()
+    {
+        return _buttons.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
