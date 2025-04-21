@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Telegami.Extensions;
 using Telegami.Sessions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -101,7 +102,7 @@ public sealed class MessageContext
             MessageId = Message.Id
         };
 
-        var message = Bot.Client.SendMessage(chatId, text,
+        return Bot.Client.Call(c => c.SendMessage(chatId, text,
             parseMode: parseMode,
             replyParameters: replyParameters,
             replyMarkup: replyMarkup,
@@ -109,9 +110,7 @@ public sealed class MessageContext
             messageThreadId: Message.MessageThreadId,
             disableNotification: disableNotification,
             protectContent: protectContent,
-            cancellationToken: cancellationToken);
-
-        return message;
+            cancellationToken: cancellationToken));
     }
 
     /// <summary>
@@ -131,16 +130,14 @@ public sealed class MessageContext
     {
         var chatId = Message.Chat.Id;
 
-        var message = Bot.Client.SendMessage(chatId, text,
+        return Bot.Client.Call(c => c.SendMessage(chatId, text,
             parseMode: parseMode,
             replyMarkup: replyMarkup,
             linkPreviewOptions: linkPreviewOptions,
             messageThreadId: Message.MessageThreadId,
             disableNotification: disableNotification,
             protectContent: protectContent,
-            cancellationToken: cancellationToken);
-
-        return message;
+            cancellationToken: cancellationToken));
     }
 
     public async Task RemoveMarkup()
@@ -152,7 +149,7 @@ public sealed class MessageContext
 
         try
         {
-            await Bot.Client.EditMessageReplyMarkup(Chat.Id, Message.Id, null, Message.BusinessConnectionId);
+            await Bot.Client.Call(c => c.EditMessageReplyMarkup(Chat.Id, Message.Id, null, Message.BusinessConnectionId));
         }
         catch// (Exception e)
         {
