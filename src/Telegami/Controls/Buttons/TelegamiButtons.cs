@@ -124,6 +124,15 @@ namespace Telegami.Controls.Buttons
             return array;
         }
 
+        public KeyboardButton[][] ToReplyButtons()
+        {
+            var ikb = _rows
+                .Select(a => a.Select(b => b.ToKeyboardButton(this)).ToArray())
+                .ToArray();
+
+            return ikb;
+        }
+
         public IEnumerator<TelegamiButtonRow> GetEnumerator()
         {
             return _rows.GetEnumerator();

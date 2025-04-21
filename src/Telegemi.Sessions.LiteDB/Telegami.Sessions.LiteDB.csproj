@@ -8,9 +8,13 @@
     <PackageReadmeFile>readme-Telegami.Sessions.LiteDB.md</PackageReadmeFile>
     <!-- Placeholder, gets overridden -->
     <Version>0.0.0</Version>
+    <PackageIcon>logo-package.png</PackageIcon>
+    <!-- Optional fallback for legacy clients -->
+    <PackageIconUrl>https://github.com/ihtfw/Teligami/raw/main/assets/logo-package.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\docs\readme-Telegami.Sessions.LiteDB.md" Link="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\logo-package.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

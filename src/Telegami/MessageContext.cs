@@ -130,7 +130,7 @@ public sealed class MessageContext
         CancellationToken cancellationToken = default)
     {
         var chatId = Message.Chat.Id;
-        
+
         var message = Bot.Client.SendMessage(chatId, text,
             parseMode: parseMode,
             replyMarkup: replyMarkup,

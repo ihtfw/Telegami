@@ -3,6 +3,7 @@ using Telegami;
 using Telegami.Controls.Buttons;
 using Telegami.Scenes;
 using Telegami.Sessions;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegamiDemoBot.OrderPizza.BtnImpl;
 
@@ -47,6 +48,7 @@ internal class BtnPizzaOrderSelectSubScene : Scene
         }
         btns.Add("Back", "back");
 
-        await ctx.SendAsync(msg, replyMarkup: btns.ToInlineButtons());
+        var keyboardButtons = (ReplyKeyboardMarkup)btns.ToInlineButtons();
+        await ctx.SendAsync(msg, replyMarkup: keyboardButtons);
     }
 }
