@@ -48,7 +48,7 @@ internal class BtnPizzaOrderSelectSubScene : Scene
         }
         btns.Add("Back", "back");
 
-        var keyboardButtons = (ReplyKeyboardMarkup)btns.ToInlineButtons();
+        var keyboardButtons = btns.ToInlineButtons();
         await ctx.SendAsync(msg, replyMarkup: keyboardButtons);
     }
 }

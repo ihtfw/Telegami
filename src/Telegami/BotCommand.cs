@@ -27,7 +27,7 @@
             }
 
             var parts = text.Split(new[] { ' ' }, 2);
-            var command = parts[0].TrimStart('/').ToLowerInvariant();
+            var command = parts[0].TrimStart('/');
             var arguments = parts.Length > 1 ? parts[1] : string.Empty;
             if (string.IsNullOrWhiteSpace(command))
             {

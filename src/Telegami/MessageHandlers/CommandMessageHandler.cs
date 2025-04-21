@@ -19,7 +19,7 @@ internal sealed class CommandMessageHandler : BaseMessageHandler
         // if bot name is provided for command and it is not equal to the bot name in the context we should ignore it
         if (!string.IsNullOrEmpty(ctx.BotCommand!.BotName)
             && !string.IsNullOrEmpty(ctx.BotUser.Username)
-            && !ctx.BotCommand.BotName.Equals(ctx.BotUser.Username))
+            && !ctx.BotCommand.BotName.Equals(ctx.BotUser.Username, StringComparison.InvariantCultureIgnoreCase))
         {
             return false;
         }

@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using Telegami.Extensions;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace Telegami.Sessions;
@@ -17,10 +18,11 @@ public record TelegamiSessionKey(long ChatId, int? ThreadId, long UserId)
             var msg = update.CallbackQuery?.Message;
             if (msg != null)
             {
-                return new TelegamiSessionKey(msg.Chat.Id, msg.MessageThreadId, update.CallbackQuery!.From.Id);
+                var messageThreadId = msg.ResolveMessageThreadId();
+                return new TelegamiSessionKey(msg.Chat.Id, messageThreadId, update.CallbackQuery!.From.Id);
             }
         }
 
-        return new TelegamiSessionKey(message.Chat.Id, message.MessageThreadId, message.From?.Id ?? 0);
+        return new TelegamiSessionKey(message.Chat.Id, message.ResolveMessageThreadId(), message.From?.Id ?? 0);
     }
 }

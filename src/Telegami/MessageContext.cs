@@ -107,7 +107,7 @@ public sealed class MessageContext
             replyParameters: replyParameters,
             replyMarkup: replyMarkup,
             linkPreviewOptions: linkPreviewOptions,
-            messageThreadId: Message.MessageThreadId,
+            messageThreadId: Message.ResolveMessageThreadId(),
             disableNotification: disableNotification,
             protectContent: protectContent,
             cancellationToken: cancellationToken));
@@ -134,7 +134,7 @@ public sealed class MessageContext
             parseMode: parseMode,
             replyMarkup: replyMarkup,
             linkPreviewOptions: linkPreviewOptions,
-            messageThreadId: Message.MessageThreadId,
+            messageThreadId: Message.ResolveMessageThreadId(),
             disableNotification: disableNotification,
             protectContent: protectContent,
             cancellationToken: cancellationToken));
