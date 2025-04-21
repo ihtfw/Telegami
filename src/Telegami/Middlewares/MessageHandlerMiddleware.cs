@@ -45,7 +45,7 @@ namespace Telegami.Middlewares
                 }
 
                 await MessageHandlerUtils.InvokeAsync(ctx, messageHandler);
-                if (messageHandler.Options.PreventHandling)
+                if (messageHandler.Options.UserHandling)
                 {
                     continue;
                 }
