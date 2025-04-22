@@ -220,7 +220,7 @@ Check out [Wiki](https://github.com/ihtfw/Telegami/wiki) for more.
   - [ ] TODO what else?
 - [ ] Write Wiki pages
 - [ ] Write Examples
-  - [X] ImageCarousel
+  - [x] ImageCarousel
 - [ ] Implement Telegami.Sessions.Redis
 - [ ] Implement Telegami.Sessions.Postgres
 - [ ] Implement Telegami.Sessions.SqlServer
