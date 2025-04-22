@@ -205,3 +205,18 @@ class Person
 ```
 
 Check out [Wiki](https://github.com/ihtfw/Telegami/wiki) for more.
+
+# Roadmap
+
+## v1.0.0
+- [ ] Stable code base
+- [ ] Write tests
+- [ ] Implement primitives, so it's easy to implement workflows
+  - [ ] PhotoCarousel
+  - [ ] DatePicker
+  - [ ] TODO what else?
+- [ ] Write Wiki pages
+- [ ] Write Examples
+- [ ] Implement Telegami.Sessions.Redis
+- [ ] Implement Telegami.Sessions.Postgres
+- [ ] Implement Telegami.Sessions.SqlServer
