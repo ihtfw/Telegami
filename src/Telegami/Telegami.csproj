@@ -4,7 +4,7 @@
     <IsPackable>true</IsPackable>
     <PackageDescription>Library to simplify creation of Telegram bots.</PackageDescription>
     <PackageTags>csharp;library;telegram;bot;telegami</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>readme-Telegami.md</PackageReadmeFile>
     <!-- Placeholder, gets overridden -->
     <Version>0.0.0</Version>
     <PackageIcon>logo-package.png</PackageIcon>
@@ -12,7 +12,7 @@
     <PackageIconUrl>https://github.com/ihtfw/Teligami/raw/main/assets/logo-package.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\docs\readme-Telegami.md" Link="README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\assets\logo-package.png" Pack="true" PackagePath="\" />
   </ItemGroup>
   <ItemGroup>

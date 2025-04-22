@@ -1,6 +1,6 @@
 # Usage example
 
-By default, Telegami uses in-memory storage. While this is acceptable, it is not persistent and also increases the application's memory footprint. 
+By default, Telegami uses in-memory storage. While this is acceptable, it is not persistent and also increases the application's memory footprint.
 To address this, we can use [LiteDB](https://github.com/litedb-org/LiteDB) for persistent storage.
 
 ```CSharp
@@ -19,3 +19,5 @@ var bot = botsManager.Get();
 
 await botsManager.LaunchAsync();
 ```
+
+More information at [GitHub](https://github.com/ihtfw/Telegami)
