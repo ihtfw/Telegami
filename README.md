@@ -220,3 +220,4 @@ Check out [Wiki](https://github.com/ihtfw/Telegami/wiki) for more.
 - [ ] Implement Telegami.Sessions.Redis
 - [ ] Implement Telegami.Sessions.Postgres
 - [ ] Implement Telegami.Sessions.SqlServer
+- [ ] Run demo bot and add link to readme
