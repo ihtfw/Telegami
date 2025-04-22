@@ -1,3 +1,4 @@
+[![NuGet](https://img.shields.io/nuget/v/Telegami.svg)](https://www.nuget.org/packages/Telegami/)
 
 # Telegami
 
