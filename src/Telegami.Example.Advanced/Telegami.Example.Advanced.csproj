@@ -14,4 +14,10 @@
     <ProjectReference Include="..\Telegemi.Sessions.LiteDB\Telegami.Sessions.LiteDB.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Assets\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

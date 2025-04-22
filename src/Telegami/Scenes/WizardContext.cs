@@ -8,7 +8,7 @@ public sealed class WizardContext<TState> : WizardContext, IHaveInvokeAfterEffec
 
     internal WizardContext(MessageContext ctx) : base(ctx)
     {
-        State = ctx.Session.Get<TState>() ?? new TState();
+        State = ctx.Session.Get<TState>();
     }
 
     public void StateChanged()

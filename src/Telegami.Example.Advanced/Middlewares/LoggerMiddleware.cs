@@ -8,11 +8,11 @@ public class LoggerMiddleware : ITelegamiMiddleware
     {
         if (ctx.Update.CallbackQuery != null)
         {
-            var jsonCallback = Utils.ToJson(ctx.Update.CallbackQuery);
+            var jsonCallback = Telegami.Utils.ToJsonDebug(ctx.Update.CallbackQuery);
             Console.WriteLine(jsonCallback);
         } 
 
-        var json = Utils.ToJson(ctx.Message);
+        var json = Telegami.Utils.ToJsonDebug(ctx.Message);
         Console.WriteLine(json);
         await next(ctx);
     }

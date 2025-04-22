@@ -121,6 +121,16 @@ namespace Telegami
                 return;
             }
 
+            if (_config.MessageTimeout > TimeSpan.Zero)
+            {
+                var age = DateTime.UtcNow - message.Date;
+                if (age > _config.MessageTimeout)
+                {
+                    // message is too old, we can skip it
+                    return;
+                }
+            }
+
             if (_config.IgnoreBotMessages)
             {
                 if (message.From?.IsBot == true)

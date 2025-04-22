@@ -22,7 +22,7 @@ internal class BtnPizzaOrderSelectSubScene : Scene
 
             await ctx.SendAsync($"Add {pizzaItem.Name} to basket!");
 
-            var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+            var state = ctx.Session.Get<PizzaOrderState>();
             state.Add(pizzaItem, 1);
             ctx.Session.Set(state);
 

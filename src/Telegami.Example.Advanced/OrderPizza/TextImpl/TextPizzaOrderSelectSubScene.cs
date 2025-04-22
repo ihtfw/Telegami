@@ -23,7 +23,7 @@ internal class TextPizzaOrderSelectSubScene : Scene
         {
             this.Command(pizzaItem.Key, async ctx =>
             {
-                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+                var state = ctx.Session.Get<PizzaOrderState>();
 
                 await ctx.SendAsync($"{pizzaItem.Name} Pizza was added to basket. Add more or use /back to return to main menu");
 

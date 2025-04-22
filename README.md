@@ -212,11 +212,11 @@ Check out [Wiki](https://github.com/ihtfw/Telegami/wiki) for more.
 - [ ] Stable code base
 - [ ] Write tests
 - [ ] Implement primitives, so it's easy to implement workflows
-  - [ ] PhotoCarousel
   - [ ] DatePicker
   - [ ] TODO what else?
 - [ ] Write Wiki pages
 - [ ] Write Examples
+  - [X] ImageCarousel
 - [ ] Implement Telegami.Sessions.Redis
 - [ ] Implement Telegami.Sessions.Postgres
 - [ ] Implement Telegami.Sessions.SqlServer

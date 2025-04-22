@@ -18,4 +18,14 @@ public class TelegamiBotConfig
     /// /telegami_debug_dump
     /// </summary>
     public bool EnableGlobalDebugDumpCommand { get; set; }
+
+    /// <summary>
+    /// TODO implement session timeout so if no response from user then leave scene
+    /// </summary>
+    public TimeSpan SessionTimeout { get; set; } = TimeSpan.FromHours(1);
+
+    /// <summary>
+    /// If message is older than this, we ignore it.
+    /// </summary>
+    public TimeSpan MessageTimeout { get; set; } = TimeSpan.FromHours(1);
 }

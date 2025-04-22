@@ -25,7 +25,7 @@ public static class TelegamiSessionEx
         return telegamiSession.Scenes[^1].Name;
     }
 
-    public static string? Get(this TelegamiSession telegamiSession, string key)
+    public static string? GetOrDefault(this TelegamiSession telegamiSession, string key)
     {
         return telegamiSession.KeyValues.GetValueOrDefault(key);
     }
@@ -48,13 +48,31 @@ public static class TelegamiSessionEx
         Set(telegamiSession, key, value);
     }
 
-    public static T? Get<T>(this TelegamiSession telegamiSession) where T : class
+    public static T? GetOrDefault<T>(this TelegamiSession telegamiSession) where T : class
+    {
+        var key = typeof(T).FullName ?? typeof(T).Name;
+        return telegamiSession.GetOrDefault<T>(key);
+    }
+
+    public static T Get<T>(this TelegamiSession telegamiSession) where T : class, new()
     {
         var key = typeof(T).FullName ?? typeof(T).Name;
         return telegamiSession.Get<T>(key);
     }
 
-    public static T? Get<T>(this TelegamiSession telegamiSession, string key) where T : class
+    public static T Get<T>(this TelegamiSession telegamiSession, string key) where T : class, new()
+    {
+        var value = telegamiSession.GetOrDefault<T>(key);
+        if (value == null)
+        {
+            value = new T();
+            telegamiSession.Set(key, value);
+        }
+
+        return value;
+    }
+
+    public static T? GetOrDefault<T>(this TelegamiSession telegamiSession, string key) where T : class
     {
         if (!telegamiSession.KeyValues.TryGetValue(key, out var value))
         {

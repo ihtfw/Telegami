@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Telegami;
+using Telegami.Controls;
+using Telegami.Example.Advanced.ImageCarousel;
 using Telegami.Example.Advanced.Middlewares;
 using Telegami.Example.Advanced.OrderPizza;
 using Telegami.Example.Advanced.OrderPizza.BtnImpl;
@@ -7,6 +9,7 @@ using Telegami.Example.Advanced.OrderPizza.TextImpl;
 using Telegami.Extensions;
 using Telegami.Scenes;
 using Telegram.Bot.Types.Enums;
+using Utils = Telegami.Example.Advanced.Utils;
 
 var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
 if (string.IsNullOrEmpty(token))
@@ -35,6 +38,7 @@ var serviceProvider = serviceCollection.BuildServiceProvider();
 var botsManager = serviceProvider.GetRequiredService<TelegamiBotsManager>();
 var bot = botsManager.Get();
 bot.Use<LoggerMiddleware>();
+bot.Use<GlobalErrorHandlerMiddleware>();
 
 var commands = """
                /help - show help
@@ -42,6 +46,7 @@ var commands = """
                /order_pizza_text - demo to show Scenes with text and commands
                /order_pizza_btn - demo to show Scenes with text and commands and buttons
                /instance_scene - example how to create scene with separate class
+               /image_carousel - interactive control to show images of cats
                """;
 
 bot.Start(async ctx =>
@@ -61,8 +66,14 @@ bot.Command("order_pizza_btn", async ctx => await ctx.EnterSceneAsync(BtnPizzaOr
 bot.Command("date", async ctx => await ctx.SendAsync(DateTime.Now.ToString("O")));
 bot.Command("instance_scene", async ctx => await ctx.EnterSceneAsync("instance_scene"));
 
+bot.Command("image_carousel", async ctx => await ctx.EnterSceneAsync(ImageCarouselScene.SceneName));
+
 bot.AddScene<TextPizzaOrderScene>(TextPizzaOrderScene.SceneName);
 bot.AddScene<BtnPizzaOrderScene>(BtnPizzaOrderScene.SceneName);
+bot.AddScene(new ImageCarouselScene()
+{
+    Images = Utils.Assets.Cats()
+} );
 
 var instanceScene = new Scene("instance_scene");
 instanceScene.Enter(async ctx => { await ctx.SendAsync("Send me a sticker! (or /back)"); });

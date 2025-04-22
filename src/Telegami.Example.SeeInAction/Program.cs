@@ -88,14 +88,14 @@ var personCardScene = new Scene("person_scene");
 personCardScene.Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"));
 personCardScene.Leave(async ctx =>
 {
-    var person = ctx.Session.Get<Person>() ?? new Person();
+    var person = ctx.Session.Get<Person>();
 
     await ctx.ReplyAsync($"Your name is {person.Name} {person.LastName}, you are {person.Age} years old.");
 });
 
 personCardScene.On(MessageType.Text, async ctx =>
 {
-    var person = ctx.Session.Get<Person>() ?? new Person();
+    var person = ctx.Session.Get<Person>();
 
     if (string.IsNullOrEmpty(person.Name))
     {

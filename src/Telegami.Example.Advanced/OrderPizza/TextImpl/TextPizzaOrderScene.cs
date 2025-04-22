@@ -28,7 +28,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 
             ReEnter(async (MessageContext ctx, PizzaMenu menu) =>
             {
-                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+                var state = ctx.Session.Get<PizzaOrderState>();
                 if (state.IsOrderCompleted)
                 {
                     var sb = new StringBuilder();
@@ -72,7 +72,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 
             this.Command("basket", (MessageContext ctx, PizzaMenu menu) =>
             {
-                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+                var state = ctx.Session.Get<PizzaOrderState>();
                 if (state.Basket.Count == 0)
                 {
                     return ctx.SendAsync("Your basket is empty.");
@@ -91,7 +91,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 
             this.Command("confirm", async ctx =>
             {
-                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+                var state = ctx.Session.Get<PizzaOrderState>();
                 if (state.Basket.Count == 0)
                 {
                     await ctx.SendAsync("Please select pizza!");
@@ -108,11 +108,11 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 
             this.Command("state", async ctx =>
             {
-                var state = ctx.Session.Get<PizzaOrderState>() ?? new PizzaOrderState();
+                var state = ctx.Session.Get<PizzaOrderState>();
 
                 await ctx.SendAsync($"""
                                     ```json
-                                    {Utils.ToJson(state)}
+                                    {Telegami.Utils.ToJsonDebug(state)}
                                     ```
                                     """, ParseMode.MarkdownV2);
             });
