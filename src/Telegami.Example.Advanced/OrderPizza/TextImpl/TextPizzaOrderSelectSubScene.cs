@@ -1,8 +1,7 @@
-﻿using Telegami;
-using Telegami.Scenes;
+﻿using Telegami.Scenes;
 using Telegami.Sessions;
 
-namespace TelegamiDemoBot.OrderPizza.TextImpl;
+namespace Telegami.Example.Advanced.OrderPizza.TextImpl;
 
 internal class TextPizzaOrderSelectSubScene : Scene
 {

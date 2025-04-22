@@ -9,15 +9,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{1141
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami.Demo.Console", "Telegami.Demo.Console\Telegami.Demo.Console.csproj", "{9F130AAF-DC96-4FD7-BAD8-4E020F1B8F76}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami", "Telegami\Telegami.csproj", "{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{69368EFC-FB38-4F3A-B580-598500E2C4F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegamiDemoBot", "TelegamiDemoBot\TelegamiDemoBot.csproj", "{61036AE1-69C5-4120-A09F-04F7608BFD02}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami.Sessions.LiteDB", "Telegemi.Sessions.LiteDB\Telegami.Sessions.LiteDB.csproj", "{0735878C-5B1D-4505-993B-C3F4BB10A802}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami.Example.Advanced", "Telegami.Example.Advanced\Telegami.Example.Advanced.csproj", "{33A4E096-4185-4E2A-9683-E461C98B31DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegami.Example.SeeInAction", "Telegami.Example.SeeInAction\Telegami.Example.SeeInAction.csproj", "{DC9C4000-4589-421D-9C45-05ACE3BA0B02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,28 +25,28 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F130AAF-DC96-4FD7-BAD8-4E020F1B8F76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F130AAF-DC96-4FD7-BAD8-4E020F1B8F76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F130AAF-DC96-4FD7-BAD8-4E020F1B8F76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F130AAF-DC96-4FD7-BAD8-4E020F1B8F76}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B2E0AE5-3453-4FF8-B6AF-759B13C0AFC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61036AE1-69C5-4120-A09F-04F7608BFD02}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0735878C-5B1D-4505-993B-C3F4BB10A802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33A4E096-4185-4E2A-9683-E461C98B31DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33A4E096-4185-4E2A-9683-E461C98B31DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33A4E096-4185-4E2A-9683-E461C98B31DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33A4E096-4185-4E2A-9683-E461C98B31DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC9C4000-4589-421D-9C45-05ACE3BA0B02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC9C4000-4589-421D-9C45-05ACE3BA0B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC9C4000-4589-421D-9C45-05ACE3BA0B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC9C4000-4589-421D-9C45-05ACE3BA0B02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9F130AAF-DC96-4FD7-BAD8-4E020F1B8F76} = {69368EFC-FB38-4F3A-B580-598500E2C4F8}
-		{61036AE1-69C5-4120-A09F-04F7608BFD02} = {69368EFC-FB38-4F3A-B580-598500E2C4F8}
+		{33A4E096-4185-4E2A-9683-E461C98B31DF} = {69368EFC-FB38-4F3A-B580-598500E2C4F8}
+		{DC9C4000-4589-421D-9C45-05ACE3BA0B02} = {69368EFC-FB38-4F3A-B580-598500E2C4F8}
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-﻿namespace Telegami.Demo.Console;
+﻿namespace Telegami.Example.SeeInAction;
 
 class Person
 {

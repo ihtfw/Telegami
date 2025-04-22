@@ -1,10 +1,9 @@
 ﻿using System.Text;
-using Telegami;
 using Telegami.Scenes;
 using Telegami.Sessions;
 using Telegram.Bot.Types.Enums;
 
-namespace TelegamiDemoBot.OrderPizza.TextImpl
+namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 {
     [SubScene(TextPizzaOrderSelectSubScene.SceneName, typeof(TextPizzaOrderSelectSubScene))]
     [SubScene(TextDeliveryDetailsSubScene.SceneName, typeof(TextDeliveryDetailsSubScene))]

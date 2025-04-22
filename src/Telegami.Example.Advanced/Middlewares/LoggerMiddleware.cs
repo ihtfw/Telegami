@@ -1,7 +1,6 @@
-﻿using Telegami;
-using Telegami.Middlewares;
+﻿using Telegami.Middlewares;
 
-namespace TelegamiDemoBot.Middlewares;
+namespace Telegami.Example.Advanced.Middlewares;
 
 public class LoggerMiddleware : ITelegamiMiddleware
 {

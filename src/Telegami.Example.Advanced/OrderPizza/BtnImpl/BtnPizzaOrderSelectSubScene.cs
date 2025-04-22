@@ -1,11 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using Telegami;
 using Telegami.Controls.Buttons;
 using Telegami.Scenes;
 using Telegami.Sessions;
-using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TelegamiDemoBot.OrderPizza.BtnImpl;
+namespace Telegami.Example.Advanced.OrderPizza.BtnImpl;
 
 internal class BtnPizzaOrderSelectSubScene : Scene
 {

@@ -1,6 +1,6 @@
 ﻿using Telegami.Commands;
 
-namespace Telegami.Demo.Console.Commands
+namespace Telegami.Example.SeeInAction.Commands
 {
     internal class ClassCommandHandler : ITelegamiCommandHandler
     {

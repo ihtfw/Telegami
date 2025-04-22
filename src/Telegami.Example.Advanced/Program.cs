@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Telegami;
+using Telegami.Example.Advanced.Middlewares;
+using Telegami.Example.Advanced.OrderPizza;
+using Telegami.Example.Advanced.OrderPizza.BtnImpl;
+using Telegami.Example.Advanced.OrderPizza.TextImpl;
 using Telegami.Extensions;
 using Telegami.Scenes;
-using TelegamiDemoBot.Middlewares;
-using TelegamiDemoBot.OrderPizza;
-using TelegamiDemoBot.OrderPizza.BtnImpl;
-using TelegamiDemoBot.OrderPizza.TextImpl;
 using Telegram.Bot.Types.Enums;
 
 var token = Environment.GetEnvironmentVariable("BOT_TOKEN");

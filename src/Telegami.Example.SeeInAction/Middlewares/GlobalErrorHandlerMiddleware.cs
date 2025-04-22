@@ -1,6 +1,6 @@
 ﻿using Telegami.Middlewares;
 
-namespace Telegami.Demo.Console.Middlewares
+namespace Telegami.Example.SeeInAction.Middlewares
 {
     internal class GlobalErrorHandlerMiddleware : ITelegamiMiddleware
     {
