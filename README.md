@@ -204,6 +204,10 @@ class Person
 }
 ```
 
+## Scene can be used to create controls. See ImageCarouselScene example.
+
+![Demo](./assets/image_carousel.webp)
+
 Check out [Wiki](https://github.com/ihtfw/Telegami/wiki) for more.
 
 # Roadmap
