@@ -1,8 +1,9 @@
 [![NuGet](https://img.shields.io/nuget/v/Telegami.svg)](https://www.nuget.org/packages/Telegami/)
 [![Publish to NuGet](https://github.com/ihtfw/Telegami/actions/workflows/publish.yml/badge.svg)](https://github.com/ihtfw/Telegami/actions/workflows/publish.yml)
 
-Telegami is the modern library for building Telegram bots. 
-The goal of Telegami is to keep things straightforward and easy to use.
+Telegami is the modern library for building Telegram bots. The goal of Telegami is to keep things straightforward and easy to use.
+
+Telegami is build on top of the [Telegram.Bot](https://github.com/TelegramBots/Telegram.Bot) library, which handles communication with the Telegram Bot API.
 
 **Current status:** Active development — breaking changes may occur between releases.
 
