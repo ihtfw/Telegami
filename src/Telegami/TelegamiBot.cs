@@ -60,7 +60,14 @@ namespace Telegami
             _config = config;
             ServiceProvider = serviceProvider;
             Key = key;
-            Client = new TelegramBotClient(new TelegramBotClientOptions(config.Token));
+
+            var botClientOptions = new TelegramBotClientOptions(config.Token)
+            {
+                RetryCount = config.RetryCount,
+                RetryThreshold = config.RetryThreshold
+            };
+
+            Client = new TelegramBotClient(botClientOptions);
 
             SessionsProvider = serviceProvider.GetKeyedService<ITelegamiSessionsProvider>(key) ?? new InMemoryTelegamiSessionsProvider();
         }
@@ -98,6 +105,10 @@ namespace Telegami
 
             _pipeline = _pipelineBuilder.Build();
 
+            // if (Client is InternalTelegramBotClient internalClient)
+            // {
+            //     internalClient.OnMessageSend += TelegramBotClientOnOnMessageSend;
+            // }
             Client.StartReceiving(UpdateHandler, ErrorHandler);
         }
 
@@ -151,6 +162,11 @@ namespace Telegami
                 if (session is null)
                 {
                     session = new TelegamiSession();
+                }
+                
+                if (update.Message != null)
+                {
+                    session.CurrentScene()?.AddUserMessageId(update.Message.Id);
                 }
 
                 await using var scope = ServiceProvider.CreateAsyncScope();
@@ -213,7 +229,10 @@ namespace Telegami
             // let's exit current scene
             if (_scenesManager.TryGet(currentScene, ctx.Scope.ServiceProvider, out var scene))
             {
-                await MessageHandlerUtils.InvokeAsync(ctx, scene!.LeaveHandler);
+                foreach (var leaveHandler in scene!.LeaveHandlers)
+                {
+                    await MessageHandlerUtils.InvokeAsync(ctx, leaveHandler);
+                }
             }
 
             // remove it from session
@@ -233,7 +252,10 @@ namespace Telegami
                 
                 if (_scenesManager.TryGet(parentSceneName, ctx.Scope.ServiceProvider, out var parentScene))
                 {
-                    await MessageHandlerUtils.InvokeAsync(ctx, parentScene!.ReEnterHandler);
+                    foreach (var reEnterHandler in scene!.ReEnterHandlers)
+                    {
+                        await MessageHandlerUtils.InvokeAsync(ctx, reEnterHandler);
+                    }
                 }
             }
         }
@@ -252,7 +274,10 @@ namespace Telegami
                 StageIndex = 0
             });
 
-            await MessageHandlerUtils.InvokeAsync(ctx, scene!.EnterHandler);
+            foreach (var enterHandler in scene!.EnterHandlers)
+            {
+                await MessageHandlerUtils.InvokeAsync(ctx, enterHandler);
+            }
         }
 
         public void AddScene(IScene sceneInstance)
@@ -343,5 +368,31 @@ namespace Telegami
         }
 
         #endregion
+
+        // private async void TelegramBotClientOnOnMessageSend(object? sender, Message msg)
+        // {
+        //     try
+        //     {
+        //         if (msg.From == null) return;
+        //
+        //         var sessionKey = TelegamiSessionKey.From(msg);
+        //
+        //         await SessionsProvider.UpdateAsync(sessionKey, (s, m) =>
+        //         {
+        //             var scene = s.Scenes.LastOrDefault();
+        //             if (scene == null)
+        //             {
+        //                 return;
+        //             }
+        //
+        //             scene.AddBotMessageId(m.Id);
+        //         }, msg);
+        //     }
+        //     catch (Exception)
+        //     {
+        //         // let's just ignore this for now
+        //         // TODO handle this properly
+        //     }
+        // }
     }
 }

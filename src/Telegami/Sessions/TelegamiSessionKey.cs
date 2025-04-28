@@ -11,6 +11,11 @@ public record TelegamiSessionKey(long ChatId, int? ThreadId, long UserId)
         return From(ctx.Update, ctx.Message);
     }
 
+    public static TelegamiSessionKey From(Message message)
+    {
+        return new TelegamiSessionKey(message.Chat.Id, message.ResolveMessageThreadId(), message.From?.Id ?? 0);
+    }
+
     public static TelegamiSessionKey From(Update update, Message message)
     {
         if (update.Type == UpdateType.CallbackQuery)

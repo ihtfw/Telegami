@@ -2,7 +2,7 @@
 
 namespace Telegami.Sessions.LiteDB;
 
-public class LiteDBTelegamiSessionsProvider : ITelegamiSessionsProvider, IDisposable
+public class LiteDBTelegamiSessionsProvider : ReaderWriterLockTelegamiSessionsProvider, IDisposable
 {
     readonly LiteDatabase _liteDatabase;
 
@@ -16,7 +16,7 @@ public class LiteDBTelegamiSessionsProvider : ITelegamiSessionsProvider, IDispos
         liteCollection.EnsureIndex(x => x.UserId);
     }
 
-    public Task<TelegamiSession?> GetAsync(TelegamiSessionKey key)
+    protected override Task<TelegamiSession?> InternalGetAsync(TelegamiSessionKey key)
     {
         var collection = _liteDatabase.GetCollection<SessionItem>();
 
@@ -29,7 +29,7 @@ public class LiteDBTelegamiSessionsProvider : ITelegamiSessionsProvider, IDispos
         return Task.FromResult<TelegamiSession?>(null);
     }
 
-    public Task SetAsync(TelegamiSessionKey key, TelegamiSession session)
+    protected override Task InternalSetAsync(TelegamiSessionKey key, TelegamiSession session)
     {
         var collection = _liteDatabase.GetCollection<SessionItem>();
 

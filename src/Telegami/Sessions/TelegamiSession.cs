@@ -1,7 +1,11 @@
-﻿namespace Telegami.Sessions;
+﻿using System.Diagnostics;
+
+namespace Telegami.Sessions;
 
 public sealed class TelegamiSession
 {
+    public long ConcurrencyToken { get; set; }
+
     public Dictionary<string, string> KeyValues { get; set; } = new();
 
     /// <summary>
@@ -13,5 +17,18 @@ public sealed class TelegamiSession
     {
         KeyValues.Clear();
         Scenes.Clear();
+    }
+
+    /// <summary>
+    /// Call this before save session to store, so we can resolve concurrency problems on update
+    /// </summary>
+    public void RefreshConcurrencyToken()
+    {
+        ConcurrencyToken = Stopwatch.GetTimestamp();
+    }
+
+    public TelegamiSessionScene? CurrentScene()
+    {
+        return Scenes.LastOrDefault();
     }
 }

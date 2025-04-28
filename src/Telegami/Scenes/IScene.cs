@@ -22,7 +22,7 @@ public interface IScene : IMessagesHandler
 {
     string Name { get; }
 
-    internal IMessageHandler ReEnterHandler { get; }
-    internal IMessageHandler EnterHandler { get; }
-    internal IMessageHandler LeaveHandler { get; }
+    internal IReadOnlyCollection<IMessageHandler> ReEnterHandlers { get; }
+    internal IReadOnlyCollection<IMessageHandler> EnterHandlers { get; }
+    internal IReadOnlyCollection<IMessageHandler> LeaveHandlers { get; }
 }

@@ -2,6 +2,12 @@
 
 public class TelegamiBotConfig
 {
+    /// <summary>Automatic retry of failed requests "Too Many Requests: retry after X" when X is less or equal to RetryThreshold</summary>
+    public int RetryThreshold { get; set; } = 90;
+
+    /// <summary><see cref="RetryThreshold">Automatic retry</see> will be attempted for up to RetryCount requests</summary>
+    public int RetryCount { get; set; } = 5;
+
     public string? Token { get; set; }
 
     /// <summary>

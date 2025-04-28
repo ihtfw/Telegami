@@ -79,11 +79,11 @@ namespace Telegami.Example.Advanced.ImageCarousel
             if (state.ImageMessageId != null)
             {
                 var media = new InputMediaPhoto(inputFile);
-                await ctx.Bot.Client.Call(x => x.EditMessageMedia(ctx.Chat.Id, state.ImageMessageId.Value, media, replyMarkup: inlineButtons));
+                await ctx.Bot.Client.EditMessageMedia(ctx.Chat.Id, state.ImageMessageId.Value, media, replyMarkup: inlineButtons);
             }
             else
             {
-                var message = await ctx.Bot.Client.Call(x => x.SendPhoto(ctx.Chat.Id, inputFile, messageThreadId: ctx.Message.ResolveMessageThreadId(), replyMarkup: inlineButtons));
+                var message = await ctx.Bot.Client.SendPhoto(ctx.Chat.Id, inputFile, messageThreadId: ctx.Message.ResolveMessageThreadId(), replyMarkup: inlineButtons);
                 state.ImageMessageId = message.Id;
 
                 ctx.Session.Set(state);

@@ -8,5 +8,5 @@ class SessionItem
     public long UserId { get; set; }
     public int? ThreadId { get; set; }
 
-    public TelegamiSession Data { get; set; } = new TelegamiSession();
+    public TelegamiSession Data { get; set; } = new();
 }

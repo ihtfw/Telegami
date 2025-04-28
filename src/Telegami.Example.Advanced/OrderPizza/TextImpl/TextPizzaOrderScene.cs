@@ -58,6 +58,8 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 
             Leave(async ctx =>
             {
+                await ctx.DeleteSceneMessagesAsync();
+
                 var msg = """
                           Thank you for using our pizza ordering service!
                           Have a great day!
@@ -68,6 +70,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
             this.Command("select", async ctx =>
             {
                 await ctx.EnterSceneAsync(TextPizzaOrderSelectSubScene.SceneName);
+                await ctx.DeleteUserMessageAsync();
             });
 
             this.Command("basket", (MessageContext ctx, PizzaMenu menu) =>

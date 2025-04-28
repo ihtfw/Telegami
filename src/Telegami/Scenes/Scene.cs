@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Telegami.Commands;
+using Telegami.Extensions;
 using Telegami.MessageHandlers;
 using Telegami.Middlewares;
 using Telegram.Bot.Types.Enums;
@@ -12,24 +13,24 @@ namespace Telegami.Scenes
 
         public string Name { get; }
 
-        private IMessageHandler EnterHandler { get; set; } = EmptyMessageHandler.Instance;
-        private IMessageHandler ReEnterHandler { get; set; } = EmptyMessageHandler.Instance;
+        private IReadOnlyCollection<IMessageHandler> EnterHandlers { get; set; } = Array.Empty<IMessageHandler>();
+        private IReadOnlyCollection<IMessageHandler> ReEnterHandlers { get; set; } = Array.Empty<IMessageHandler>();
 
-        IMessageHandler IScene.EnterHandler => EnterHandler;
-        IMessageHandler IScene.ReEnterHandler => ReEnterHandler;
+        IReadOnlyCollection<IMessageHandler> IScene.EnterHandlers => EnterHandlers;
+        IReadOnlyCollection<IMessageHandler> IScene.ReEnterHandlers => ReEnterHandlers;
 
-        private IMessageHandler LeaveHandler { get; set; } = EmptyMessageHandler.Instance;
+        private IReadOnlyCollection<IMessageHandler> LeaveHandlers { get; set; } = Array.Empty<IMessageHandler>();
 
-        IMessageHandler IScene.LeaveHandler => LeaveHandler;
+        IReadOnlyCollection<IMessageHandler> IScene.LeaveHandlers => LeaveHandlers;
 
         public Scene(string name)
         {
             Name = name;
         }
-
+        
         public void Leave(Delegate handler)
         {
-            LeaveHandler = new DelegateMessageHandler(handler);
+            LeaveHandlers = LeaveHandlers.Add(new DelegateMessageHandler(handler));
         }
 
         public void Leave(Func<Task> func)
@@ -48,7 +49,7 @@ namespace Telegami.Scenes
         /// <param name="handler"></param>
         public void Enter(Delegate handler)
         {
-            EnterHandler = new DelegateMessageHandler(handler);
+            EnterHandlers = EnterHandlers.Add(new DelegateMessageHandler(handler));
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace Telegami.Scenes
         /// <param name="handler"></param>
         public void ReEnter(Delegate handler)
         {
-            ReEnterHandler = new DelegateMessageHandler(handler);
+            ReEnterHandlers = ReEnterHandlers.Add(new DelegateMessageHandler(handler));
         }
 
         /// <summary>

@@ -9,6 +9,12 @@ internal class TextPizzaOrderSelectSubScene : Scene
 
     public TextPizzaOrderSelectSubScene(PizzaMenu menu) : base(SceneName)
     {
+        Leave(async ctx =>
+        {
+            await ctx.DeleteSceneBotMessagesAsync();
+            await ctx.DeleteSceneUserMessagesAsync();
+        });
+
         Enter(async (MessageContext ctx, PizzaMenu m) =>
         {
             var msg = $"""

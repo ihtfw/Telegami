@@ -8,6 +8,12 @@ internal class TextDeliveryDetailsSubScene : WizardScene
 
     public TextDeliveryDetailsSubScene() : base(SceneName)
     {
+        Leave(async ctx =>
+        {
+            await ctx.DeleteSceneBotMessagesAsync();
+            await ctx.DeleteSceneUserMessagesAsync();
+        });
+
         Add(AskNameStage);
         Add(SetNameStage);
         Add(SetPhoneStage);
