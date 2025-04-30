@@ -15,7 +15,7 @@ namespace Telegami.Example.Advanced.OrderPizza.BtnImpl
 
         public BtnPizzaOrderScene() : base(SceneName)
         {
-            Enter(async ctx =>
+            this.Enter(async ctx =>
             {
                 var btns = new TelegamiButtons
                 {
@@ -94,7 +94,7 @@ namespace Telegami.Example.Advanced.OrderPizza.BtnImpl
 
             this.CallbackQuery("cancel", async ctx => { await ctx.LeaveSceneAsync(); });
 
-            Leave(async ctx =>
+            this.Leave(async ctx =>
             {
                 var msg = """
                           Thank you for using our pizza ordering service!

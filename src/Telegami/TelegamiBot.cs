@@ -252,7 +252,7 @@ namespace Telegami
                 
                 if (_scenesManager.TryGet(parentSceneName, ctx.Scope.ServiceProvider, out var parentScene))
                 {
-                    foreach (var reEnterHandler in scene!.ReEnterHandlers)
+                    foreach (var reEnterHandler in parentScene!.ReEnterHandlers)
                     {
                         await MessageHandlerUtils.InvokeAsync(ctx, reEnterHandler);
                     }

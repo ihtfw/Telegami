@@ -8,7 +8,7 @@ internal class TextDeliveryDetailsSubScene : WizardScene
 
     public TextDeliveryDetailsSubScene() : base(SceneName)
     {
-        Leave(async ctx =>
+        this.Leave(async ctx =>
         {
             await ctx.DeleteSceneBotMessagesAsync();
             await ctx.DeleteSceneUserMessagesAsync();

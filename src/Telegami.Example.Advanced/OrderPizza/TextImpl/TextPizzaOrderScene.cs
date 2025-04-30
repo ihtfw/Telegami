@@ -13,7 +13,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 
         public TextPizzaOrderScene() : base(SceneName)
         {
-            Enter(async ctx =>
+            this.Enter(async ctx =>
             {
                 var msg = """
                           Let's order pizza!
@@ -56,7 +56,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
                 await ctx.SendAsync(msg);
             });
 
-            Leave(async ctx =>
+            this.Leave(async ctx =>
             {
                 await ctx.DeleteSceneMessagesAsync();
 

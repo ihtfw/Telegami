@@ -33,16 +33,6 @@ namespace Telegami.Scenes
             LeaveHandlers = LeaveHandlers.Add(new DelegateMessageHandler(handler));
         }
 
-        public void Leave(Func<Task> func)
-        {
-            Leave((Delegate)func);
-        }
-
-        public void Leave(Func<MessageContext, Task> func)
-        {
-            Leave((Delegate)func);
-        }
-
         /// <summary>
         /// Invoked on Scene Enter via EnterSceneAsync() method
         /// </summary>
@@ -51,25 +41,7 @@ namespace Telegami.Scenes
         {
             EnterHandlers = EnterHandlers.Add(new DelegateMessageHandler(handler));
         }
-
-        /// <summary>
-        /// Invoked on Scene Enter via EnterSceneAsync() method
-        /// </summary>
-        /// <param name="handler"></param>
-        public void Enter(Func<Task> handler)
-        {
-            Enter((Delegate)handler);
-        }
-
-        /// <summary>
-        /// Invoked on Scene Enter via EnterSceneAsync() method
-        /// </summary>
-        /// <param name="handler"></param>
-        public void Enter(Func<MessageContext, Task> handler)
-        {
-            Enter((Delegate)handler);
-        }
-
+        
         /// <summary>
         /// Invoked after returning back from sub scene
         /// </summary>
@@ -78,25 +50,7 @@ namespace Telegami.Scenes
         {
             ReEnterHandlers = ReEnterHandlers.Add(new DelegateMessageHandler(handler));
         }
-
-        /// <summary>
-        /// Invoked after returning back from sub scene
-        /// </summary>
-        /// <param name="handler"></param>
-        public void ReEnter(Func<Task> handler)
-        {
-            ReEnter((Delegate)handler);
-        }
         
-        /// <summary>
-        /// Invoked after returning back from sub scene
-        /// </summary>
-        /// <param name="handler"></param>
-        public void ReEnter(Func<MessageContext, Task> handler)
-        {
-            ReEnter((Delegate)handler);
-        }
-
         #region IMessagesHandler
 
         IReadOnlyList<IMessageHandler> IMessagesHandler.Handlers => _messagesHandler.Handlers;
