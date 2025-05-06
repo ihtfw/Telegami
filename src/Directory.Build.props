@@ -31,4 +31,9 @@
     <!-- Remove unnecessary using directives (IDE0005) -->
     <WarningsAsErrors>$(WarningsAsErrors);IDE0005;NU1506;NU1008;NU1504;CS8618;CS0168;CS8622;CS1998;CS0108;CS8625;CS8600;CS8601;CS8602;CS8603;CS8604;CS8620</WarningsAsErrors>
   </PropertyGroup>
+
+  <!-- Documentation only in release -->
+  <PropertyGroup Condition=" '$(Configuration.ToLower())' == 'release' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
 </Project>
