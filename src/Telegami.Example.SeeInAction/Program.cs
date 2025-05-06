@@ -57,9 +57,6 @@ bot.Command("error", () => throw new Exception("This is a test exception"));
 
 bot.Command("echo", async ctx => { await ctx.EnterSceneAsync("echo"); });
 
-bot.Command("person", async ctx => { await ctx.EnterSceneAsync("person_scene"); });
-
-bot.Command("person_wizard", async ctx => { await ctx.EnterSceneAsync("person_wizard_scene"); });
 
 // Handle only specific message types
 bot.On(MessageType.Sticker, async (MessageContext ctx) => { await ctx.ReplyAsync($"What a nice sticker!"); });
@@ -83,6 +80,7 @@ bot.AddScene("echo", new Scene()
 
 #region person scene
 
+bot.Command("person", async ctx => { await ctx.EnterSceneAsync("person_scene"); });
 bot.AddScene("person_scene",
     new Scene()
         .Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"))
@@ -126,6 +124,7 @@ bot.AddScene("person_scene",
 
 #region wizard scene
 
+bot.Command("person_wizard", async ctx => { await ctx.EnterSceneAsync("person_wizard_scene"); });
 bot.AddScene("person_wizard_scene", new WizardScene(async (MessageContext ctx, WizardContext wiz) =>
     {
         await ctx.SendAsync("Hi! What's your name?");

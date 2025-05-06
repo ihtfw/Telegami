@@ -10,6 +10,7 @@ Telegami is build on top of the [Telegram.Bot](https://github.com/TelegramBots/T
 # See in action
 
 ## Minimal example
+
 ```csharp
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddTelegamiBot("BOT_TOKEN_FROM_BOT_FATHER");
@@ -37,6 +38,7 @@ await botsManager.LaunchAsync();
 That's it! Bot is working and can handle **/start** and **/custom** commands.
 
 ## Other handlers and DI
+
 ```csharp
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddScoped<MyCustomService>(); // <- our service
@@ -66,6 +68,7 @@ await botsManager.LaunchAsync();
 ```
 
 ## Scenes
+
 Scene is matched to user.id, chat.id and thread.id, so every user can have his own active Scene.
 While user is on scene, all messages are handled by this Scene.
 Also we can navigate from one Scene to another for more complex scenarios.
@@ -75,49 +78,44 @@ Also we can navigate from one Scene to another for more complex scenarios.
 // /person command so we can enter scene
 bot.Command("person", async ctx => { await ctx.EnterSceneAsync("person_scene"); });
 
-// let's collect some user inforamtion: name, last name and age
-var personCardScene = new Scene("person_scene");
-// Invoked when EnterSceneAsync is called
-personCardScene.Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"));
-// Invoked when LeaveSceneAsync is called
-personCardScene.Leave(async ctx =>
-{
-    var person = ctx.Session.Get<Person>() ?? new Person();
+bot.AddScene("person_scene",
+    new Scene()
+        .Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"))
+        .Leave(async ctx =>
+        {
+            var person = ctx.Session.Get<Person>();
 
-    await ctx.ReplyAsync($"Your name is {person.Name} {person.LastName}, you are {person.Age} years old.");
-});
+            await ctx.ReplyAsync($"Your name is {person.Name} {person.LastName}, you are {person.Age} years old.");
+        })
+        .On(MessageType.Text, async ctx =>
+        {
+            var person = ctx.Session.Get<Person>();
 
-// declare all handlers that you need, so simplicity let's handle only text messages
-personCardScene.On(MessageType.Text, async ctx =>
-{
-    var person = ctx.Session.Get<Person>() ?? new Person();
+            if (string.IsNullOrEmpty(person.Name))
+            {
+                person.Name = ctx.Message.Text;
+                ctx.Session.Set(person);
+                await ctx.ReplyAsync($"What's your last name?");
+                return;
+            }
 
-    if (string.IsNullOrEmpty(person.Name))
-    {
-        person.Name = ctx.Message.Text;
-        ctx.Session.Set(person);
-        await ctx.ReplyAsync($"What's your last name?");
-        return;
-    }
+            if (string.IsNullOrEmpty(person.LastName))
+            {
+                person.LastName = ctx.Message.Text;
+                ctx.Session.Set(person);
+                await ctx.ReplyAsync($"What's your age?");
+                return;
+            }
 
-    if (string.IsNullOrEmpty(person.LastName))
-    {
-        person.LastName = ctx.Message.Text;
-        ctx.Session.Set(person);
-        await ctx.ReplyAsync($"What's your age?");
-        return;
-    }
+            if (!int.TryParse(ctx.Message.Text, out var age))
+            {
+                await ctx.ReplyAsync($"Age should be a number!");
+                return;
+            }
 
-    if (!int.TryParse(ctx.Message.Text, out var age))
-    {
-        await ctx.ReplyAsync($"Age should be a number!");
-        return;
-    }
-
-    person.Age = age;
-    await ctx.LeaveSceneAsync();
-});
-bot.AddScene(personCardScene);
+            person.Age = age;
+            await ctx.LeaveSceneAsync();
+        }));
 ```
 
 ## WizardScenes
@@ -127,29 +125,24 @@ It's special type of scene where we can navigate. Let's check out same example w
 ```csharp
 
 // /person_wizard command so we can enter scene
-bot.Command("person_wizard", async ctx => { await ctx.EnterSceneAsync("person_wizard_scene"); });
 
-var wizardScene = new WizardScene("person_wizard_scene",
-    // called on Enter
-    async (MessageContext ctx, WizardContext wiz) =>
+bot.Command("person_wizard", async ctx => { await ctx.EnterSceneAsync("person_wizard_scene"); });
+bot.AddScene("person_wizard_scene", new WizardScene(async (MessageContext ctx, WizardContext wiz) =>
     {
         await ctx.SendAsync("Hi! What's your name?");
-        // go to next step
-        wiz.Next(); 
+        wiz.Next();
     },
-    // this one will be invoked on next message from user, where we are expecting his name
     async (MessageContext ctx, WizardContext<Person> wiz) =>
     {
         if (string.IsNullOrEmpty(ctx.Message.Text))
         {
-            await ctx.SendAsync("Incorrect message, please send text as name");
+            await ctx.SendAsync("Incorrect message, please send text");
             return;
         }
-        // set name
+
         wiz.State.Name = ctx.Message.Text;
 
         await ctx.SendAsync("Hi! What's your last name?");
-        // go to next step
         wiz.Next();
     },
     async (MessageContext ctx, WizardContext<Person> wiz) =>
@@ -181,15 +174,10 @@ var wizardScene = new WizardScene("person_wizard_scene",
 
         wiz.State.Age = age;
 
-        // ok, we have all data so we let's print it
         await ctx.SendAsync($"Thank you! Your information is:\n{wiz.State}");
-
-        // leave scene
         await ctx.LeaveSceneAsync();
     }
-);
-
-bot.AddScene(wizardScene);
+));
 
 class Person
 {
@@ -213,6 +201,7 @@ Check out [Wiki](https://github.com/ihtfw/Telegami/wiki) for more.
 # Roadmap
 
 ## v1.0.0
+
 - [ ] Stable code base
 - [ ] Write tests
 - [ ] Implement primitives, so it's easy to implement workflows
