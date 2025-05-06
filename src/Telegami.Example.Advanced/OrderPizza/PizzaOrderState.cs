@@ -9,6 +9,8 @@ internal class PizzaOrderState
     public string? DeliveryAddress { get; set; }
     public bool IsOrderCompleted { get; set; }
 
+    public DateTime? DeliveryDate { get; set; }
+
     public void Add(PizzaItem item, int count)
     {
         if (Basket.TryGetValue(item.Key, out var currentCount))

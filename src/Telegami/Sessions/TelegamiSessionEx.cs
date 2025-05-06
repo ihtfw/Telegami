@@ -54,6 +54,13 @@ public static class TelegamiSessionEx
         return telegamiSession.GetOrDefault<T>(key);
     }
 
+    /// <summary>
+    /// Helper method to update state in session, that will get, update and set it back to session
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="telegamiSession"></param>
+    /// <param name="updateStateAction"></param>
+    /// <returns></returns>
     public static T Update<T>(this TelegamiSession telegamiSession, Action<T> updateStateAction)
         where T : class, new()
     {

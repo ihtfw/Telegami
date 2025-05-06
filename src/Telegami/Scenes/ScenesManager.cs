@@ -7,21 +7,21 @@ namespace Telegami.Scenes
         private readonly Dictionary<string, Type> _nameToSceneType = new();
         private readonly Dictionary<string, IScene> _nameToScene = new();
 
-        public void Add(IScene sceneInstance)
+        public void Add(string name, IScene sceneInstance)
         {
-            if (_nameToSceneType.TryGetValue(sceneInstance.Name, out var existingSceneType))
+            if (_nameToSceneType.TryGetValue(name, out var existingSceneType))
             {
                 throw new ArgumentException(
-                    $"Scene '{sceneInstance.Name}' already registered in the bot with type {existingSceneType.FullName}. You was trying to register scene with instance");
+                    $"Scene '{name}' already registered in the bot with type {existingSceneType.FullName}. You was trying to register scene with instance");
             }
 
-            if (_nameToScene.TryGetValue(sceneInstance.Name, out var existingScene))
+            if (_nameToScene.TryGetValue(name, out var existingScene))
             {
                 throw new ArgumentException(
-                    $"Scene '{sceneInstance.Name}' already registered in the bot with instance {existingScene.GetType().FullName}. You was trying to register scene with instance");
+                    $"Scene '{name}' already registered in the bot with instance {existingScene.GetType().FullName}. You was trying to register scene with instance");
             }
 
-            _nameToScene.Add(sceneInstance.Name, sceneInstance);
+            _nameToScene.Add(name, sceneInstance);
 
             AddSubScenesFromAttributes(sceneInstance.GetType());
         }
@@ -47,6 +47,11 @@ namespace Telegami.Scenes
 
         public void Add(string sceneName, Type sceneType, bool ignoreDuplicates = false)
         {
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                throw new ArgumentException($"Scene name can't be empty or null", nameof(sceneName));
+            }
+
             if (sceneType.IsAbstract)
             {
                 throw new ArgumentException($"Scene type {sceneType.Name} is abstract");

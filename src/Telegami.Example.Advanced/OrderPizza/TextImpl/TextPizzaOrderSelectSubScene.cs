@@ -5,9 +5,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl;
 
 internal class TextPizzaOrderSelectSubScene : Scene
 {
-    public const string SceneName = "TextPizzaOrderSelectSubScene";
-
-    public TextPizzaOrderSelectSubScene(PizzaMenu menu) : base(SceneName)
+    public TextPizzaOrderSelectSubScene(PizzaMenu menu)
     {
         this.Leave(async ctx =>
         {

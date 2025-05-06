@@ -12,7 +12,7 @@ namespace Telegami.Example.Advanced.Middlewares
             }
             catch (Exception e)
             {
-                System.Console.WriteLine(e);
+                Console.WriteLine(e);
                 try
                 {
                     await ctx.SendAsync("ERROR! " + e.Message);

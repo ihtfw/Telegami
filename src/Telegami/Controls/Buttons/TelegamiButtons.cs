@@ -115,6 +115,10 @@ namespace Telegami.Controls.Buttons
             _rows.Insert(index, row);
         }
 
+        /// <summary>
+        /// Buttons that are shown in chat with message
+        /// </summary>
+        /// <returns></returns>
         public InlineKeyboardButton[][] ToInlineButtons()
         {
             var array = _rows
@@ -124,6 +128,10 @@ namespace Telegami.Controls.Buttons
             return array;
         }
 
+        /// <summary>
+        /// Buttons that are global for chat, so be careful with them
+        /// </summary>
+        /// <returns></returns>
         public KeyboardButton[][] ToReplyButtons()
         {
             var ikb = _rows

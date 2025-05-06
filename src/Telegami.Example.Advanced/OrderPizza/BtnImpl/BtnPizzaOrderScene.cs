@@ -7,13 +7,11 @@ using Telegram.Bot.Types.Enums;
 
 namespace Telegami.Example.Advanced.OrderPizza.BtnImpl
 {
-    [SubScene(BtnPizzaOrderSelectSubScene.SceneName, typeof(BtnPizzaOrderSelectSubScene))]
-    [SubScene(TextDeliveryDetailsSubScene.SceneName, typeof(TextDeliveryDetailsSubScene))]
+    [SubScene(typeof(BtnPizzaOrderSelectSubScene))]
+    [SubScene(typeof(TextDeliveryDetailsSubScene))]
     internal class BtnPizzaOrderScene : Scene
     {
-        public const string SceneName = "BtnPizzaOrderScene";
-
-        public BtnPizzaOrderScene() : base(SceneName)
+        public BtnPizzaOrderScene()
         {
             this.Enter(async ctx =>
             {
@@ -53,9 +51,9 @@ namespace Telegami.Example.Advanced.OrderPizza.BtnImpl
             this.Command("cancel", async ctx => await ctx.LeaveSceneAsync());
 
             this.CallbackQuery("select",
-                async ctx => { await ctx.EnterSceneAsync(BtnPizzaOrderSelectSubScene.SceneName); });
+                async ctx => { await ctx.EnterSceneAsync<BtnPizzaOrderSelectSubScene>(); });
 
-            this.CallbackQuery("basket", async (MessageContext ctx, PizzaMenu menu) =>
+            CallbackQuery("basket", async (MessageContext ctx, PizzaMenu menu) =>
             {
                 var state = ctx.Session.Get<PizzaOrderState>();
                 if (state.Basket.Count == 0)
@@ -89,7 +87,7 @@ namespace Telegami.Example.Advanced.OrderPizza.BtnImpl
                     return;
                 }
 
-                await ctx.EnterSceneAsync(TextDeliveryDetailsSubScene.SceneName);
+                await ctx.EnterSceneAsync<TextDeliveryDetailsSubScene>();
             });
 
             this.CallbackQuery("cancel", async ctx => { await ctx.LeaveSceneAsync(); });

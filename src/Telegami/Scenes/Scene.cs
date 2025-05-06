@@ -10,8 +10,14 @@ namespace Telegami.Scenes
     public class Scene : IScene
     {
         private readonly MessagesHandler _messagesHandler = new();
+        
+        public Scene() { }
 
-        public string Name { get; }
+        [Obsolete("Name is not needed anymore for Scene! Just use ctor without name!", true)]
+        // ReSharper disable once UnusedParameter.Local
+        public Scene(string name)
+        {
+        }
 
         private IReadOnlyCollection<IMessageHandler> EnterHandlers { get; set; } = Array.Empty<IMessageHandler>();
         private IReadOnlyCollection<IMessageHandler> ReEnterHandlers { get; set; } = Array.Empty<IMessageHandler>();
@@ -23,11 +29,6 @@ namespace Telegami.Scenes
 
         IReadOnlyCollection<IMessageHandler> IScene.LeaveHandlers => LeaveHandlers;
 
-        public Scene(string name)
-        {
-            Name = name;
-        }
-        
         public void Leave(Delegate handler)
         {
             LeaveHandlers = LeaveHandlers.Add(new DelegateMessageHandler(handler));
@@ -91,10 +92,5 @@ namespace Telegami.Scenes
         }
 
         #endregion
-
-        public override string ToString()
-        {
-            return Name;
-        }
     }
 }

@@ -58,6 +58,8 @@ public sealed class MessageContext
     public TelegamiSession Session { get; set; }
 
     public bool IsCommand => BotCommand != null;
+    public bool IsCallbackQuery => !string.IsNullOrEmpty(CallbackData);
+    public string? CallbackData => Update.CallbackQuery?.Data;
 
     /// <summary>
     /// if will be true, after message context is processed, then we will try to process message again.
@@ -80,6 +82,16 @@ public sealed class MessageContext
     /// <returns></returns>
     public Task EnterSceneAsync(string sceneName)
     {
+        return Bot.EnterSceneAsync(this, sceneName);
+    }
+
+    /// <summary>
+    /// Enters the scene. Attempts to resolve name of scene from attribute, or from type name.
+    /// </summary>
+    /// <returns></returns> 
+    public Task EnterSceneAsync<T>() where T : IScene
+    {
+        var sceneName = SceneAttribute.ResolveSceneName(typeof(T));
         return Bot.EnterSceneAsync(this, sceneName);
     }
 
@@ -171,6 +183,7 @@ public sealed class MessageContext
     /// <param name="document">File to send. Pass a FileId as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using <see cref="InputFileStream"/>. <a href="https://core.telegram.org/bots/api#sending-files">More information on Sending Files »</a></param>
     /// <param name="caption">Document caption (may also be used when resending documents by <em>FileId</em>), 0-1024 characters after entities parsing</param>
     /// <param name="parseMode">Mode for parsing entities in the document caption. See <a href="https://core.telegram.org/bots/api#formatting-options">formatting options</a> for more details.</param>
+    /// <param name="replyMarkup">Additional interface options. An object for an <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>, <a href="https://core.telegram.org/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</param>
     /// <param name="thumbnail">Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using <see cref="InputFileStream"/>. Thumbnails can't be reused and can be only uploaded as a new file, so you can use <see cref="InputFileStream(Stream, string?)"/> with a specific filename. <a href="https://core.telegram.org/bots/api#sending-files">More information on Sending Files »</a></param>
     /// <param name="messageThreadId">Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</param>
     /// <param name="captionEntities">A list of special entities that appear in the caption, which can be specified instead of <paramref name="parseMode"/></param>

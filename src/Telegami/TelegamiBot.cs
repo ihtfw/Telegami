@@ -309,19 +309,82 @@ namespace Telegami
             }
         }
 
-        public void AddScene(IScene sceneInstance)
+        /// <summary>
+        /// Add scene to the bot. Scene name will be taken from SceneAttribute.
+        /// </summary>
+        /// <param name="sceneInstance"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public TelegamiBot AddScene(IScene sceneInstance)
         {
-            _scenesManager.Add(sceneInstance);
+            var sceneName = SceneAttribute.ResolveSceneName(sceneInstance.GetType());
+            AddScene(sceneName, sceneInstance);
+            return this;
         }
 
-        public void AddScene(string sceneName, Type sceneType)
+        /// <summary>
+        /// Add scene to the bot. Scene name will be taken from sceneName parameter.
+        /// </summary>
+        /// <param name="sceneName"></param>
+        /// <param name="sceneInstance"></param>
+        public TelegamiBot AddScene(string sceneName, IScene sceneInstance)
         {
+            _scenesManager.Add(sceneName, sceneInstance);
+            return this;
+        }
+
+        /// <summary>
+        /// Add scene to the bot. Scene name will be taken from sceneName parameter.
+        /// </summary>
+        /// <param name="sceneName"></param>
+        /// <param name="sceneType"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public TelegamiBot AddScene(string sceneName, Type sceneType)
+        {
+            if (!typeof(IScene).IsAssignableFrom(sceneType))
+            {
+                throw new ArgumentException($"Type {sceneType} is not a scene", nameof(sceneType));
+            }
+
             _scenesManager.Add(sceneName, sceneType);
+            return this;
         }
 
-        public void AddScene<TScene>(string sceneName) where TScene : IScene
+        /// <summary>
+        /// Add scene to the bot. Scene name will be taken from SceneAttribute.
+        /// </summary>
+        /// <param name="sceneType"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public TelegamiBot AddScene(Type sceneType)
         {
-            _scenesManager.Add(sceneName, typeof(TScene));
+            if (!typeof(IScene).IsAssignableFrom(sceneType))
+            {
+                throw new ArgumentException($"Type {sceneType} is not a scene", nameof(sceneType));
+            }
+            
+            var sceneName = SceneAttribute.ResolveSceneName(sceneType);
+            _scenesManager.Add(sceneName, sceneType);
+            return this;
+        }
+
+        /// <summary>
+        /// Add scene to the bot. Scene name will be taken from sceneName parameter.
+        /// </summary>
+        /// <typeparam name="TScene"></typeparam>
+        /// <param name="sceneName"></param>
+        public TelegamiBot AddScene<TScene>(string sceneName) where TScene : IScene
+        {
+            AddScene(sceneName, typeof(TScene));
+            return this;
+        }
+
+        /// <summary>
+        /// Add scene to the bot. Scene name will be taken from SceneAttribute.
+        /// </summary>
+        /// <typeparam name="TScene"></typeparam>
+        public TelegamiBot AddScene<TScene>() where TScene : IScene
+        {
+            AddScene(typeof(TScene));
+            return this;
         }
 
         #endregion
@@ -332,27 +395,30 @@ namespace Telegami
         /// Add middleware to the pipeline.
         /// </summary>
         /// <typeparam name="TMiddleware"></typeparam>
-        public void Use<TMiddleware>() where TMiddleware : ITelegamiMiddleware
+        public TelegamiBot Use<TMiddleware>() where TMiddleware : ITelegamiMiddleware
         {
             _pipelineBuilder.Use<TMiddleware>();
+            return this;
         }
 
         /// <summary>
         /// Add middleware to the pipeline.
         /// </summary>
         /// <param name="middlewareFactory"></param>
-        public void Use(Func<ITelegamiMiddleware> middlewareFactory)
+        public TelegamiBot Use(Func<ITelegamiMiddleware> middlewareFactory)
         {
             _pipelineBuilder.Use(middlewareFactory);
+            return this;
         }
         
         /// <summary>
         /// Add middleware to the pipeline.
         /// </summary>
         /// <param name="middleware"></param>
-        public void Use(Func<MessageContext, MessageContextDelegate, Task> middleware)
+        public TelegamiBot Use(Func<MessageContext, MessageContextDelegate, Task> middleware)
         {
             _pipelineBuilder.Use(middleware);
+            return this;
         }
 
         #endregion

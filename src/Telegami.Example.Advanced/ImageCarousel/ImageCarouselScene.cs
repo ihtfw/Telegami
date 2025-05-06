@@ -17,9 +17,7 @@ namespace Telegami.Example.Advanced.ImageCarousel
 
     public class ImageCarouselScene : Scene
     {
-        public const string SceneName = "ImageCarouselScene";
-
-        public ImageCarouselScene() : base(SceneName)
+        public ImageCarouselScene()
         {
             Enter(Render);
 

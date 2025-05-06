@@ -1,12 +1,38 @@
-﻿using Telegami.Scenes;
+﻿using Telegami.Controls.DatePicker;
+using Telegami.Scenes;
+using Telegami.Sessions;
 
 namespace Telegami.Example.Advanced.OrderPizza.TextImpl;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+internal class DeliveryDatePickerWizardScene : DatePickerWizardScene
+{
+    public DeliveryDatePickerWizardScene()
+    {
+        Message = "Let's select delivery time";
+        this.Leave(OnLeave);
+    }
+
+    private Task OnLeave(MessageContext ctx)
+    {
+        var pickerState = ctx.Session.GetOrDefault<DatePickerWizardSceneState>();
+        if (pickerState == null || pickerState.Day == null || pickerState.Month == null || pickerState.Year == null)
+            return Task.CompletedTask;
+
+        ctx.Session.Update<PizzaOrderState>(s =>
+        {
+            s.DeliveryDate = new DateTime(pickerState.Year.Value, pickerState.Month.Value, pickerState.Day.Value);
+        });
+
+        return Task.CompletedTask;
+    }
+}
+#pragma warning restore CS0618 // Type or member is obsolete
+
+[SubScene(typeof(DeliveryDatePickerWizardScene))]
 internal class TextDeliveryDetailsSubScene : WizardScene
 {
-    public const string SceneName = "TextDeliveryDetailsSubScene";
-
-    public TextDeliveryDetailsSubScene() : base(SceneName)
+    public TextDeliveryDetailsSubScene()
     {
         this.Leave(async ctx =>
         {
@@ -14,12 +40,25 @@ internal class TextDeliveryDetailsSubScene : WizardScene
             await ctx.DeleteSceneUserMessagesAsync();
         });
 
+        Add(DateStage);
         Add(AskNameStage);
         Add(SetNameStage);
         Add(SetPhoneStage);
         Add(SetDeliveryAddressStage);
 
         this.Command("back", async (ctx) => await ctx.LeaveSceneAsync());
+    }
+
+    private async Task DateStage(MessageContext ctx, WizardContext<PizzaOrderState> wiz)
+    {
+        if (wiz.State.DeliveryDate != null)
+        {
+            wiz.Next();
+            wiz.ForceExecute();
+            return;
+        }
+
+        await ctx.EnterSceneAsync<DeliveryDatePickerWizardScene>();
     }
 
     private async Task AskNameStage(MessageContext ctx, WizardContext<PizzaOrderState> wiz)

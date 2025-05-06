@@ -5,13 +5,11 @@ using Telegram.Bot.Types.Enums;
 
 namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 {
-    [SubScene(TextPizzaOrderSelectSubScene.SceneName, typeof(TextPizzaOrderSelectSubScene))]
-    [SubScene(TextDeliveryDetailsSubScene.SceneName, typeof(TextDeliveryDetailsSubScene))]
+    [SubScene(typeof(TextPizzaOrderSelectSubScene))]
+    [SubScene(typeof(TextDeliveryDetailsSubScene))]
     internal class TextPizzaOrderScene : Scene
     {
-        public const string SceneName = "TextPizzaOrderScene";
-
-        public TextPizzaOrderScene() : base(SceneName)
+        public TextPizzaOrderScene()
         {
             this.Enter(async ctx =>
             {
@@ -69,11 +67,11 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
 
             this.Command("select", async ctx =>
             {
-                await ctx.EnterSceneAsync(TextPizzaOrderSelectSubScene.SceneName);
+                await ctx.EnterSceneAsync<TextPizzaOrderSelectSubScene>();
                 await ctx.DeleteUserMessageAsync();
             });
 
-            this.Command("basket", (MessageContext ctx, PizzaMenu menu) =>
+            Command("basket", (MessageContext ctx, PizzaMenu menu) =>
             {
                 var state = ctx.Session.Get<PizzaOrderState>();
                 if (state.Basket.Count == 0)
@@ -101,7 +99,7 @@ namespace Telegami.Example.Advanced.OrderPizza.TextImpl
                     return;
                 }
 
-                await ctx.EnterSceneAsync(TextDeliveryDetailsSubScene.SceneName);
+                await ctx.EnterSceneAsync<TextDeliveryDetailsSubScene>();
             });
 
             this.Command("cancel", async ctx =>

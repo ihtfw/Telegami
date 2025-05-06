@@ -7,14 +7,12 @@ namespace Telegami.Example.Advanced.OrderPizza.BtnImpl;
 
 internal class BtnPizzaOrderSelectSubScene : Scene
 {
-    public const string SceneName = "BtnPizzaOrderSelectSubScene";
-
-    public BtnPizzaOrderSelectSubScene() : base(SceneName)
+    public BtnPizzaOrderSelectSubScene()
     {
         Enter(AskPizza);
 
         var pizzaMatch = new Regex("^pizza_(?<key>.+)$");
-        this.CallbackQuery(pizzaMatch, async (MessageContext ctx, PizzaMenu menu) =>
+        CallbackQuery(pizzaMatch, async (MessageContext ctx, PizzaMenu menu) =>
         {
             var match = pizzaMatch.Match(ctx.Update.CallbackQuery!.Data!);
             var key = match.Groups["key"].Value;

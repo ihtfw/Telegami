@@ -70,66 +70,63 @@ bot.Hears("world", async ctx => { await ctx.ReplyAsync("hello!"); });
 
 #region echo scene
 
-var echoScene = new Scene("echo");
-echoScene.Enter(async ctx => await ctx.ReplyAsync("echo scene"));
-echoScene.Leave(async ctx => await ctx.ReplyAsync("exiting echo scene"));
-echoScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
-echoScene.Command("leave", async ctx => await ctx.LeaveSceneAsync());
-echoScene.On(MessageType.Text, async ctx => await ctx.ReplyAsync(ctx.Message.Text ?? ""));
-echoScene.On(async ctx => await ctx.ReplyAsync("Only text messages please"));
-
-bot.AddScene(echoScene);
+bot.AddScene("echo", new Scene()
+    .Enter(async ctx => await ctx.ReplyAsync("echo scene"))
+    .Leave(async ctx => await ctx.ReplyAsync("exiting echo scene"))
+    .Command("back", async ctx => await ctx.LeaveSceneAsync())
+    .Command("leave", async ctx => await ctx.LeaveSceneAsync())
+    .On(MessageType.Text, async ctx => await ctx.ReplyAsync(ctx.Message.Text ?? ""))
+    .On(async ctx => await ctx.ReplyAsync("Only text messages please"))
+);
 
 #endregion
 
 #region person scene
 
-var personCardScene = new Scene("person_scene");
-personCardScene.Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"));
-personCardScene.Leave(async ctx =>
-{
-    var person = ctx.Session.Get<Person>();
+bot.AddScene("person_scene",
+    new Scene()
+        .Enter(async ctx => await ctx.SendAsync("Hi! What's your name?"))
+        .Leave(async ctx =>
+        {
+            var person = ctx.Session.Get<Person>();
 
-    await ctx.ReplyAsync($"Your name is {person.Name} {person.LastName}, you are {person.Age} years old.");
-});
+            await ctx.ReplyAsync($"Your name is {person.Name} {person.LastName}, you are {person.Age} years old.");
+        })
+        .On(MessageType.Text, async ctx =>
+        {
+            var person = ctx.Session.Get<Person>();
 
-personCardScene.On(MessageType.Text, async ctx =>
-{
-    var person = ctx.Session.Get<Person>();
+            if (string.IsNullOrEmpty(person.Name))
+            {
+                person.Name = ctx.Message.Text;
+                ctx.Session.Set(person);
+                await ctx.ReplyAsync($"What's your last name?");
+                return;
+            }
 
-    if (string.IsNullOrEmpty(person.Name))
-    {
-        person.Name = ctx.Message.Text;
-        ctx.Session.Set(person);
-        await ctx.ReplyAsync($"What's your last name?");
-        return;
-    }
+            if (string.IsNullOrEmpty(person.LastName))
+            {
+                person.LastName = ctx.Message.Text;
+                ctx.Session.Set(person);
+                await ctx.ReplyAsync($"What's your age?");
+                return;
+            }
 
-    if (string.IsNullOrEmpty(person.LastName))
-    {
-        person.LastName = ctx.Message.Text;
-        ctx.Session.Set(person);
-        await ctx.ReplyAsync($"What's your age?");
-        return;
-    }
+            if (!int.TryParse(ctx.Message.Text, out var age))
+            {
+                await ctx.ReplyAsync($"Age should be a number!");
+                return;
+            }
 
-    if (!int.TryParse(ctx.Message.Text, out var age))
-    {
-        await ctx.ReplyAsync($"Age should be a number!");
-        return;
-    }
-
-    person.Age = age;
-    await ctx.LeaveSceneAsync();
-});
-bot.AddScene(personCardScene);
+            person.Age = age;
+            await ctx.LeaveSceneAsync();
+        }));
 
 #endregion
 
 #region wizard scene
 
-var wizardScene = new WizardScene("person_wizard_scene",
-    async (MessageContext ctx, WizardContext wiz) =>
+bot.AddScene("person_wizard_scene", new WizardScene(async (MessageContext ctx, WizardContext wiz) =>
     {
         await ctx.SendAsync("Hi! What's your name?");
         wiz.Next();
@@ -141,6 +138,7 @@ var wizardScene = new WizardScene("person_wizard_scene",
             await ctx.SendAsync("Incorrect message, please send text");
             return;
         }
+
         wiz.State.Name = ctx.Message.Text;
 
         await ctx.SendAsync("Hi! What's your last name?");
@@ -178,32 +176,28 @@ var wizardScene = new WizardScene("person_wizard_scene",
         await ctx.SendAsync($"Thank you! Your information is:\n{wiz.State}");
         await ctx.LeaveSceneAsync();
     }
-);
-
-bot.AddScene(wizardScene);
+));
 
 #endregion
 
 #region nested scenes
 
 bot.Command("root_scene", async ctx => await ctx.EnterSceneAsync("root_scene"));
-var rootScene = new Scene("root_scene");
-rootScene.Enter(async ctx => await ctx.ReplyAsync("This is root scene"));
-rootScene.Leave(async ctx => await ctx.ReplyAsync("Exiting root scene"));
-rootScene.Command("child", async ctx => await ctx.EnterSceneAsync("child_scene"));
-rootScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
-rootScene.Command("leave", async ctx => await ctx.LeaveSceneAsync());
-rootScene.Command("exit", async ctx => await ctx.LeaveSceneAsync());
-rootScene.Command("ping", async ctx => await ctx.ReplyAsync("pong from root"));
 
-var childScene = new Scene("child_scene");
-childScene.Enter(async ctx => await ctx.ReplyAsync("This is child scene"));
-childScene.Leave(async ctx => await ctx.ReplyAsync("Exiting child scene"));
-childScene.Command("back", async ctx => await ctx.LeaveSceneAsync());
-childScene.Command("ping", async ctx => await ctx.ReplyAsync("pong from child"));
-
-bot.AddScene(rootScene);
-bot.AddScene(childScene);
+bot.AddScene("root_scene", new Scene()
+    .Enter(async ctx => await ctx.ReplyAsync("This is root scene"))
+    .Leave(async ctx => await ctx.ReplyAsync("Exiting root scene"))
+    .Command("child", async ctx => await ctx.EnterSceneAsync("child_scene"))
+    .Command("back", async ctx => await ctx.LeaveSceneAsync())
+    .Command("leave", async ctx => await ctx.LeaveSceneAsync())
+    .Command("exit", async ctx => await ctx.LeaveSceneAsync())
+    .Command("ping", async ctx => await ctx.ReplyAsync("pong from root"))
+);
+bot.AddScene("child_scene", new Scene()
+    .Enter(async ctx => await ctx.ReplyAsync("This is child scene"))
+    .Leave(async ctx => await ctx.ReplyAsync("Exiting child scene"))
+    .Command("back", async ctx => await ctx.LeaveSceneAsync())
+    .Command("ping", async ctx => await ctx.ReplyAsync("pong from child")));
 
 #endregion
 

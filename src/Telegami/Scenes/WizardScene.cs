@@ -7,8 +7,14 @@ public class WizardScene : Scene
 {
     private readonly List<IMessageHandler> _stages = new();
     private readonly Dictionary<string, int> _stageNameToIndex = new();
+    
+    [Obsolete("Name is not needed anymore for WizardScene! Just use ctor without name!", true)]
+    // ReSharper disable once UnusedParameter.Local
+    public WizardScene(string name, params Delegate[] stages) : this(stages)
+    {
+    }
 
-    public WizardScene(string name, params Delegate[] stages) : base(name)
+    public WizardScene(params Delegate[] stages)
     {
         foreach (var stage in stages)
         {
@@ -54,23 +60,28 @@ public class WizardScene : Scene
         });
     }
 
-    public void Add<TState>(Func<MessageContext, WizardContext<TState>, Task> stage, string? stageName = null) where TState : class, new()
+    public WizardScene Add<TState>(Func<MessageContext, WizardContext<TState>, Task> stage, string? stageName = null) where TState : class, new()
     {
         AddState(stage, stageName);
+        return this;
     }
 
-    public void Add(Func<MessageContext, WizardContext, Task> stage, string? stageName = null)
+    public WizardScene Add(Func<MessageContext, WizardContext, Task> stage, string? stageName = null)
     {
         AddState(stage, stageName);
+        return this;
     }
 
-    public void Add(Func<MessageContext, Task> stage, string? stageName = null)
+    public WizardScene Add(Func<MessageContext, Task> stage, string? stageName = null)
     {
         AddState(stage, stageName);
+        return this;
     }
-    public void Add(Delegate stage, string? stageName = null)
+
+    public WizardScene Add(Delegate stage, string? stageName = null)
     {
         AddState(stage, stageName);
+        return this;
     }
 
     private void AddState(Delegate stage, string? stageName)
