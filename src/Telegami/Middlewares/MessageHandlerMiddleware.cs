@@ -22,42 +22,51 @@ namespace Telegami.Middlewares
                 return;
             }
 
-            var resolvedMessagesHandler = _messagesHandler;
-
-            var sceneName = ctx.Session.CurrentSceneName();
-            while (sceneName != null)
+            do
             {
-                if (_scenesManager.TryGet(sceneName, ctx.Scope.ServiceProvider, out var scene))
+                ctx.IsRetry = false;
+                ctx.IsHandled = false;
+
+                var resolvedMessagesHandler = _messagesHandler;
+
+                var sceneName = ctx.Session.CurrentSceneName();
+                while (sceneName != null)
                 {
-                    resolvedMessagesHandler = scene!;
+                    if (_scenesManager.TryGet(sceneName, ctx.Scope.ServiceProvider, out var scene))
+                    {
+                        resolvedMessagesHandler = scene!;
+                        ctx.CurrentScene = scene;
+                        break;
+                    }
+
+                    ctx.Session.DropCurrentScene();
+                    sceneName = ctx.Session.CurrentSceneName();
+                    ctx.CurrentScene = null;
+                }
+                
+                foreach (var messageHandler in resolvedMessagesHandler.Handlers)
+                {
+                    if (!await messageHandler.CanHandleAsync(ctx))
+                    {
+                        continue;
+                    }
+
+                    await MessageHandlerUtils.InvokeAsync(ctx, messageHandler);
+                    if (!messageHandler.Options.PreventRemoveMarkup)
+                    {
+                        await ctx.RemoveMarkup();
+                    }
+
+                    if (messageHandler.Options.UserHandling)
+                    {
+                        continue;
+                    }
+
+                    ctx.IsHandled = true;
                     break;
                 }
 
-                ctx.Session.DropCurrentScene();
-                sceneName = ctx.Session.CurrentSceneName();
-            }
-            
-            foreach (var messageHandler in resolvedMessagesHandler.Handlers)
-            {
-                if (!await messageHandler.CanHandleAsync(ctx))
-                {
-                    continue;
-                }
-
-                await MessageHandlerUtils.InvokeAsync(ctx, messageHandler);
-                if (messageHandler.Options.UserHandling)
-                {
-                    continue;
-                }
-
-                if (!messageHandler.Options.PreventRemoveMarkup)
-                {
-                    await ctx.RemoveMarkup();
-                }
-
-                ctx.IsHandled = true;
-                break;
-            }
+            } while (ctx.IsRetry);
 
             await next(ctx);
         }

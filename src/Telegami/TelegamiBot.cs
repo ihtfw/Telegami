@@ -223,12 +223,14 @@ namespace Telegami
             var currentScene = ctx.Session.CurrentSceneName();
             if (currentScene == null)
             {
+                ctx.CurrentScene = null;
                 return;
             }
 
             // let's exit current scene
             if (_scenesManager.TryGet(currentScene, ctx.Scope.ServiceProvider, out var scene))
             {
+                ctx.CurrentScene = scene;
                 foreach (var leaveHandler in scene!.LeaveHandlers)
                 {
                     await MessageHandlerUtils.InvokeAsync(ctx, leaveHandler);
@@ -239,6 +241,7 @@ namespace Telegami
             ctx.Session.DropCurrentScene();
             if (ctx.Session.Scenes.Count == 0)
             {
+                ctx.CurrentScene = null;
                 // if all scenes are popped, we can reset session to clear data
                 ctx.Session.Reset();
             }
@@ -252,10 +255,35 @@ namespace Telegami
                 
                 if (_scenesManager.TryGet(parentSceneName, ctx.Scope.ServiceProvider, out var parentScene))
                 {
+                    ctx.CurrentScene = parentScene;
                     foreach (var reEnterHandler in parentScene!.ReEnterHandlers)
                     {
                         await MessageHandlerUtils.InvokeAsync(ctx, reEnterHandler);
                     }
+                }
+            }
+        }
+
+        internal async Task ReEnterSceneAsync(MessageContext ctx)
+        {
+            if (ctx.Session.Scenes.Count == 0)
+            {
+                // we don't have any scenes to re-enter
+                return;
+            }
+            
+            var currentSceneName = ctx.Session.CurrentSceneName();
+            if (currentSceneName == null)
+            {
+                return;
+            }
+
+            if (_scenesManager.TryGet(currentSceneName, ctx.Scope.ServiceProvider, out var currentScene))
+            {
+                ctx.CurrentScene = currentScene;
+                foreach (var reEnterHandler in currentScene!.ReEnterHandlers)
+                {
+                    await MessageHandlerUtils.InvokeAsync(ctx, reEnterHandler);
                 }
             }
         }
@@ -268,6 +296,7 @@ namespace Telegami
                 return;
             }
 
+            ctx.CurrentScene = scene;
             ctx.Session.Scenes.Add(new TelegamiSessionScene
             {
                 Name = sceneName,

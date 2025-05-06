@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Telegami.Extensions;
+using Telegami.Scenes;
 using Telegami.Sessions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -42,6 +43,8 @@ public sealed class MessageContext
         }
     }
 
+    internal IScene? CurrentScene { get; set; }
+
     /// <summary>
     /// Message was processed by some handler
     /// </summary>
@@ -55,6 +58,11 @@ public sealed class MessageContext
     public TelegamiSession Session { get; set; }
 
     public bool IsCommand => BotCommand != null;
+
+    /// <summary>
+    /// if will be true, after message context is processed, then we will try to process message again.
+    /// </summary>
+    internal bool IsRetry { get; set; }
 
     /// <summary>
     /// Leaves the current scene and returns to previous scene.
@@ -73,6 +81,16 @@ public sealed class MessageContext
     public Task EnterSceneAsync(string sceneName)
     {
         return Bot.EnterSceneAsync(this, sceneName);
+    }
+
+    /// <summary>
+    /// Force to ReEnter Scene can be useful in certain cases when you want to reenter the scene,
+    /// so basically it will call ReEnter handlers for this scene
+    /// </summary>
+    /// <returns></returns>
+    public Task ReEnterSceneAsync()
+    {
+        return Bot.ReEnterSceneAsync(this);
     }
 
     /// <summary>

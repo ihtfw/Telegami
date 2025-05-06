@@ -1,4 +1,6 @@
-﻿namespace Telegami;
+﻿using Telegami.Scenes;
+
+namespace Telegami;
 
 public class WizardContext
 {
@@ -7,6 +9,11 @@ public class WizardContext
     internal WizardContext(MessageContext ctx)
     {
         Ctx = ctx;
+    }
+
+    public void ForceExecute()
+    {
+        Ctx.IsRetry = true;
     }
 
     public void Next()
@@ -24,6 +31,22 @@ public class WizardContext
         if (current != null)
         {
             current.StageIndex--;
+        }
+    }
+
+    public void Set(string stageName)
+    {
+        var current = Ctx.Session.Scenes.LastOrDefault();
+        if (current != null)
+        {
+            if (Ctx.CurrentScene is WizardScene wizardScene)
+            {
+                current.StageIndex = wizardScene.GetIndex(stageName);
+            }
+            else
+            {
+                current.StageIndex = -1;
+            }
         }
     }
 

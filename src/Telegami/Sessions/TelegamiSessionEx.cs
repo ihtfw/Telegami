@@ -54,6 +54,16 @@ public static class TelegamiSessionEx
         return telegamiSession.GetOrDefault<T>(key);
     }
 
+    public static T Update<T>(this TelegamiSession telegamiSession, Action<T> updateStateAction)
+        where T : class, new()
+    {
+        var state = telegamiSession.Get<T>();
+        updateStateAction(state);
+        telegamiSession.Set(state);
+
+        return state;
+    }
+
     public static T Get<T>(this TelegamiSession telegamiSession) where T : class, new()
     {
         var key = typeof(T).FullName ?? typeof(T).Name;
